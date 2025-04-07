@@ -1,3 +1,8 @@
+// This file is a backup of the original main.js
+// We've switched to an inline script in index.html that follows Russell Samora's exact example pattern
+
+// Original content below:
+
 // Main JavaScript for Fear, Read, Repeat scrollytelling experience
 
 // Track active section for progress indicator
@@ -11,166 +16,41 @@ const sections = [
   "epilogue",
 ];
 
-// Create placeholder visualizations
+// Initialize SVGs for each section's placeholder
 function createPlaceholderVisualizations() {
   const canvasPlaceholders = document.querySelectorAll(".canvas-placeholder");
 
-  canvasPlaceholders.forEach((placeholder, index) => {
+  canvasPlaceholders.forEach((placeholder) => {
     // Create an SVG element for visual placeholder
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "100%");
     svg.setAttribute("class", "canvas-visualization");
     svg.style.overflow = "visible";
-    svg.style.position = "absolute"; // Make sure it's absolutely positioned
+    svg.style.position = "absolute";
     svg.style.top = "0";
     svg.style.left = "0";
     svg.style.width = "100%";
     svg.style.height = "100%";
-    svg.style.zIndex = "10"; // Ensure it's above other elements
 
-    // Different shape for each section
-    const sectionId = placeholder.closest(".section").id;
-
-    // Base styling
-    svg.innerHTML = getPlaceholderSVG(sectionId, 0);
+    // Set an empty initial SVG (without waiting text)
+    svg.innerHTML = `<rect x="10%" y="10%" width="80%" height="80%" fill="none" stroke="#ccc" stroke-width="1" />`;
 
     placeholder.appendChild(svg);
 
-    // Log to console for debugging
-    console.log(`Created SVG for section: ${sectionId}`, placeholder);
+    // Find the closest step and update the visualization immediately
+    setTimeout(() => {
+      const section = placeholder.closest(".section");
+      if (section) {
+        const firstStep = section.querySelector(".step");
+        if (firstStep) {
+          const stepText =
+            firstStep.querySelector("p")?.textContent.trim() || "";
+          updateStepVisualization(placeholder, stepText, 0);
+        }
+      }
+    }, 100);
   });
-}
-
-// Generate SVG content based on section and step
-function getPlaceholderSVG(sectionId, stepIndex) {
-  // Get colors from CSS variables
-  const colors = {
-    introduction: getComputedStyle(document.documentElement)
-      .getPropertyValue("--introduction-color")
-      .trim(),
-    preface: getComputedStyle(document.documentElement)
-      .getPropertyValue("--preface-color")
-      .trim(),
-    chapter1: getComputedStyle(document.documentElement)
-      .getPropertyValue("--chapter1-color")
-      .trim(),
-    chapter2: getComputedStyle(document.documentElement)
-      .getPropertyValue("--chapter2-color")
-      .trim(),
-    chapter3: getComputedStyle(document.documentElement)
-      .getPropertyValue("--chapter3-color")
-      .trim(),
-    epilogue: getComputedStyle(document.documentElement)
-      .getPropertyValue("--epilogue-color")
-      .trim(),
-  };
-
-  const baseColor = colors[sectionId] || "#333";
-
-  // Different SVG patterns for each section
-  switch (sectionId) {
-    case "introduction":
-      return `
-        <circle cx="50%" cy="50%" r="${
-          30 + stepIndex * 20
-        }%" fill="none" stroke="${baseColor}" stroke-width="4" />
-        <circle cx="50%" cy="50%" r="${
-          10 + stepIndex * 10
-        }%" fill="${baseColor}" opacity="0.3" />
-        <text x="50%" y="50%" text-anchor="middle" fill="${baseColor}" style="font-size: 24px; font-weight: bold;">Step ${
-        stepIndex + 1
-      }</text>
-      `;
-    case "preface":
-      return `
-        <rect x="${20 - stepIndex * 10}%" y="${20 - stepIndex * 10}%" width="${
-        60 + stepIndex * 20
-      }%" height="${
-        60 + stepIndex * 20
-      }%" fill="none" stroke="${baseColor}" stroke-width="4" />
-        <rect x="${35}%" y="${35}%" width="${30}%" height="${30}%" fill="${baseColor}" opacity="0.3" />
-        <text x="50%" y="50%" text-anchor="middle" fill="${baseColor}" style="font-size: 24px; font-weight: bold;">Step ${
-        stepIndex + 1
-      }</text>
-      `;
-    case "chapter1":
-      const points = generatePolygonPoints(6 + stepIndex, 40 + stepIndex * 10);
-      return `
-        <polygon points="${points}" fill="none" stroke="${baseColor}" stroke-width="4" />
-        <circle cx="50%" cy="50%" r="${
-          15 + stepIndex * 5
-        }%" fill="${baseColor}" opacity="0.3" />
-        <text x="50%" y="50%" text-anchor="middle" fill="${baseColor}" style="font-size: 24px; font-weight: bold;">Step ${
-        stepIndex + 1
-      }</text>
-      `;
-    case "chapter2":
-      return `
-        <line x1="${10 + stepIndex * 5}%" y1="${50}%" x2="${
-        90 - stepIndex * 5
-      }%" y2="${50}%" stroke="${baseColor}" stroke-width="4" />
-        <line x1="${50}%" y1="${10 + stepIndex * 5}%" x2="${50}%" y2="${
-        90 - stepIndex * 5
-      }%" stroke="${baseColor}" stroke-width="4" />
-        <rect x="${40 - stepIndex * 5}%" y="${40 - stepIndex * 5}%" width="${
-        20 + stepIndex * 10
-      }%" height="${20 + stepIndex * 10}%" fill="${baseColor}" opacity="0.3" />
-        <text x="50%" y="50%" text-anchor="middle" fill="${baseColor}" style="font-size: 24px; font-weight: bold;">Step ${
-        stepIndex + 1
-      }</text>
-      `;
-    case "chapter3":
-      return `
-        <circle cx="${
-          30 + stepIndex * 10
-        }%" cy="50%" r="10%" fill="${baseColor}" opacity="0.3" />
-        <circle cx="${
-          70 - stepIndex * 10
-        }%" cy="50%" r="10%" fill="${baseColor}" opacity="0.3" />
-        <path d="M ${30 + stepIndex * 10}% 50% Q 50% ${20 + stepIndex * 15}%, ${
-        70 - stepIndex * 10
-      }% 50%" fill="none" stroke="${baseColor}" stroke-width="4" />
-        <text x="50%" y="50%" text-anchor="middle" fill="${baseColor}" style="font-size: 24px; font-weight: bold;">Step ${
-        stepIndex + 1
-      }</text>
-      `;
-    case "epilogue":
-      return `
-        <rect x="20%" y="20%" width="60%" height="60%" fill="none" stroke="${baseColor}" stroke-width="4" rx="${
-        5 + stepIndex * 15
-      }%" ry="${5 + stepIndex * 15}%" />
-        <circle cx="50%" cy="50%" r="${
-          10 + stepIndex * 7
-        }%" fill="${baseColor}" opacity="0.3" />
-        <text x="50%" y="50%" text-anchor="middle" fill="${baseColor}" style="font-size: 24px; font-weight: bold;">Step ${
-        stepIndex + 1
-      }</text>
-      `;
-    default:
-      return `
-        <circle cx="50%" cy="50%" r="30%" fill="none" stroke="${baseColor}" stroke-width="4" />
-        <text x="50%" y="50%" text-anchor="middle" fill="${baseColor}" style="font-size: 24px; font-weight: bold;">Step ${
-        stepIndex + 1
-      }</text>
-      `;
-  }
-}
-
-// Helper function to generate polygon points
-function generatePolygonPoints(sides, radius) {
-  let points = [];
-  const centerX = 50;
-  const centerY = 50;
-
-  for (let i = 0; i < sides; i++) {
-    const angle = (i * 2 * Math.PI) / sides - Math.PI / 2; // Start from top
-    const x = centerX + radius * Math.cos(angle);
-    const y = centerY + radius * Math.sin(angle);
-    points.push(`${x}%,${y}%`);
-  }
-
-  return points.join(" ");
 }
 
 // Initialize scrollama for each section
@@ -189,11 +69,8 @@ function initScrollama() {
     // Handle window resize
     function handleResize() {
       const figureHeight = window.innerHeight;
-      const figureMarginTop = 0;
-
       figure.style.height = `${figureHeight}px`;
-      figure.style.top = `${figureMarginTop}px`;
-
+      figure.style.top = "0";
       scroller.resize();
     }
 
@@ -208,17 +85,18 @@ function initScrollama() {
         }
       });
 
+      // Get the text content from the current step
+      const stepText =
+        response.element.querySelector("p")?.textContent.trim() || "";
+
       // Update active section for progress indicator
       const currentSection = findCurrentSection(response.element);
       if (currentSection) {
         updateProgressIndicator(currentSection);
 
-        // Update visualization placeholder
-        updateVisualizationPlaceholder(currentSection, response.index, figure);
+        // Update SVG with current step's content
+        updateStepVisualization(figure, stepText, response.index);
       }
-
-      // Here you would also update visualizations based on the current step
-      // This can be implemented later when you're ready to add data visualizations
     }
 
     // Set up the scroller
@@ -230,10 +108,8 @@ function initScrollama() {
       })
       .onStepEnter(handleStepEnter);
 
-    // Initial resize to properly size elements
+    // Initial resize
     handleResize();
-
-    // Add resize listener
     window.addEventListener("resize", handleResize);
   });
 }
@@ -244,10 +120,77 @@ function findCurrentSection(stepElement) {
   return sectionElement ? sectionElement.id : null;
 }
 
+// Create a unique visualization for each step, including the step's text
+function updateStepVisualization(figure, stepText, stepIndex) {
+  const svg = figure.querySelector(".canvas-visualization");
+  if (!svg) return;
+
+  // Get color based on step index
+  const colors = [
+    "#e41a1c",
+    "#377eb8",
+    "#4daf4a",
+    "#984ea3",
+    "#ff7f00",
+    "#a65628",
+  ];
+  const color = colors[stepIndex % colors.length];
+
+  // Create a unique visualization for this step
+  let svgContent = "";
+
+  switch (stepIndex % 3) {
+    case 0:
+      // Rectangle with step text
+      svgContent = `
+        <rect x="10%" y="10%" width="80%" height="80%" fill="none" stroke="${color}" stroke-width="3" />
+        <foreignObject x="15%" y="15%" width="70%" height="70%">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: sans-serif; color: ${color}; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center;">
+            <p style="margin: 0;">${stepText}</p>
+          </div>
+        </foreignObject>
+      `;
+      break;
+    case 1:
+      // Circle with step text
+      svgContent = `
+        <circle cx="50%" cy="50%" r="40%" fill="none" stroke="${color}" stroke-width="3" />
+        <foreignObject x="20%" y="20%" width="60%" height="60%">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: sans-serif; color: ${color}; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center;">
+            <p style="margin: 0;">${stepText}</p>
+          </div>
+        </foreignObject>
+      `;
+      break;
+    case 2:
+      // Triangle with step text - fixed the polygon points to use absolute values instead of percentages
+      svgContent = `
+        <polygon points="300,50 450,350 150,350" fill="none" stroke="${color}" stroke-width="3" />
+        <foreignObject x="20%" y="30%" width="60%" height="50%">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: sans-serif; color: ${color}; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center;">
+            <p style="margin: 0;">${stepText}</p>
+          </div>
+        </foreignObject>
+      `;
+      break;
+  }
+
+  // Update the SVG content
+  svg.innerHTML = svgContent;
+
+  // Add animation effect
+  svg.style.opacity = "0";
+  svg.style.transform = "scale(0.95)";
+  setTimeout(() => {
+    svg.style.opacity = "1";
+    svg.style.transform = "scale(1)";
+    svg.style.transition = "all 0.5s ease";
+  }, 50);
+}
+
 // Update progress indicator
 function updateProgressIndicator(sectionId) {
   if (activeSection === sectionId) return;
-
   activeSection = sectionId;
 
   const progressItems = document.querySelectorAll(".progress-nav li");
@@ -263,7 +206,6 @@ function updateProgressIndicator(sectionId) {
 // Add click events to progress nav
 function setupProgressNav() {
   const progressItems = document.querySelectorAll(".progress-nav li");
-
   progressItems.forEach((item) => {
     item.addEventListener("click", () => {
       const targetSection = document.getElementById(item.dataset.section);
@@ -272,63 +214,6 @@ function setupProgressNav() {
       }
     });
   });
-}
-
-// Update visualization placeholder
-function updateVisualizationPlaceholder(sectionId, stepIndex, figure) {
-  const svg = figure.querySelector(".canvas-visualization");
-  if (svg) {
-    console.log(
-      `Updating visualization for section ${sectionId}, step ${stepIndex}`
-    );
-
-    // Update the SVG content based on the current step
-    svg.innerHTML = getPlaceholderSVG(sectionId, stepIndex);
-
-    // Add animation to show transition - update to avoid translate conflicts
-    svg.style.opacity = "0.9";
-    svg.style.transform = "scale(0.95)";
-    setTimeout(() => {
-      svg.style.opacity = "1";
-      svg.style.transform = "scale(1)";
-    }, 50);
-
-    // Change the border of the placeholder
-    const placeholder = figure.querySelector(".canvas-placeholder");
-    if (placeholder) {
-      // Get the CSS variable for this section's color
-      const sectionColor = getComputedStyle(document.documentElement)
-        .getPropertyValue(`--${sectionId}-color`)
-        .trim();
-
-      // Apply styles based on step
-      placeholder.style.borderColor = sectionColor;
-      placeholder.style.borderWidth = `${2 + stepIndex}px`;
-
-      // Make background more visible with a bit of color
-      const opacity = 0.1 + stepIndex * 0.05;
-      placeholder.style.backgroundColor = `rgba(${
-        sectionId === "introduction"
-          ? "108, 117, 125"
-          : sectionId === "preface"
-          ? "74, 124, 89"
-          : sectionId === "chapter1"
-          ? "134, 117, 169"
-          : sectionId === "chapter2"
-          ? "199, 81, 70"
-          : sectionId === "chapter3"
-          ? "65, 101, 138"
-          : "86, 77, 74"
-      }, ${opacity})`;
-
-      console.log(
-        `Updated placeholder styles for ${sectionId}`,
-        placeholder.style.backgroundColor
-      );
-    }
-  } else {
-    console.warn("SVG element not found in figure");
-  }
 }
 
 // On page load
@@ -352,10 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Use Intersection Observer to track active section
 function setupSectionObservers() {
   const sectionElements = document.querySelectorAll(".section");
-
-  const options = {
-    threshold: 0.2, // 20% of the section is visible
-  };
+  const options = { threshold: 0.2 };
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {

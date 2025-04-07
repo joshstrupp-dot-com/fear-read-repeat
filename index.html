@@ -3,308 +3,204 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fear, Read, Repeat: A Self-Help Book Data Story</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <title>Basic Scrollama Example</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        line-height: 1.5;
+        color: #333;
+      }
+
+      #intro {
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+
+      .intro__hed {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .intro__dek {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      #scrolly {
+        position: relative;
+        display: flex;
+        background-color: #f3f3f3;
+        padding: 1rem;
+      }
+
+      #scrolly > * {
+        flex: 1;
+      }
+
+      article {
+        position: relative;
+        padding: 0 1rem;
+        max-width: 20rem;
+      }
+
+      figure {
+        position: sticky;
+        width: 100%;
+        margin: 0;
+        transform: translate3d(0, 0, 0);
+        background-color: #8a8a8a;
+        z-index: 0;
+      }
+
+      figure p {
+        text-align: center;
+        padding: 1rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 8rem;
+        font-weight: 900;
+        color: #fff;
+      }
+
+      .step {
+        margin: 0 auto 2rem auto;
+        background-color: #3b3b3b;
+        color: #fff;
+      }
+
+      .step:last-child {
+        margin-bottom: 0;
+      }
+
+      .step.is-active {
+        background-color: goldenrod;
+        color: #3b3b3b;
+      }
+
+      .step p {
+        text-align: center;
+        padding: 1rem;
+        font-size: 1.5rem;
+      }
+
+      #outro {
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+    </style>
   </head>
   <body>
-    <nav class="progress-nav">
-      <ul>
-        <li data-section="introduction"><span>Introduction</span></li>
-        <li data-section="preface"><span>Preface</span></li>
-        <li data-section="chapter1"><span>Chapter 1</span></li>
-        <li data-section="chapter2"><span>Chapter 2</span></li>
-        <li data-section="chapter3"><span>Chapter 3</span></li>
-        <li data-section="epilogue"><span>Epilogue</span></li>
-      </ul>
-    </nav>
-
     <main>
-      <!-- Introduction Section -->
-      <section id="introduction" class="section">
-        <div class="section-title">
-          <div class="scrolly">
-            <article>
-              <div class="step title-step" data-position="center">
-                <h1>Introduction</h1>
-                <p>
-                  The world of self-help books and what they tell us about
-                  ourselves
-                </p>
-              </div>
-            </article>
-            <figure>
-              <!-- Visualization canvas will go here -->
-              <div class="canvas-placeholder">
-                <!-- This will be replaced with SVG/Canvas/WebGL later -->
-              </div>
-            </figure>
-          </div>
-        </div>
-
-        <div class="scrolly">
-          <article>
-            <div class="step" data-position="left">
-              <p>
-                Our journey begins with a simple question: what can we learn
-                from the self-help books that surround us?
-              </p>
-            </div>
-            <div class="step" data-position="left">
-              <p>
-                Each year, millions of people turn to self-help books for
-                guidance, inspiration, and transformation.
-              </p>
-            </div>
-            <div class="step" data-position="left">
-              <p>
-                Let's explore what these books reveal about our collective
-                desires, fears, and hopes.
-              </p>
-            </div>
-          </article>
-          <figure>
-            <!-- Visualization canvas will go here -->
-            <div class="canvas-placeholder">
-              <!-- This will be replaced with SVG/Canvas/WebGL later -->
-            </div>
-          </figure>
-        </div>
+      <section id="intro">
+        <h1 class="intro__hed">Basic Scrollama Example</h1>
+        <p class="intro__dek">Start scrolling to see how it works.</p>
       </section>
 
-      <!-- Preface Section -->
-      <section id="preface" class="section">
-        <div class="section-title">
-          <div class="scrolly">
-            <article>
-              <div class="step title-step" data-position="center">
-                <h1>Preface</h1>
-                <p>Customize your journey through self-help literature</p>
-              </div>
-            </article>
-            <figure>
-              <!-- Visualization canvas will go here -->
-              <div class="canvas-placeholder">
-                <!-- This will be replaced with SVG/Canvas/WebGL later -->
-              </div>
-            </figure>
+      <section id="scrolly">
+        <article>
+          <div class="step" data-step="1">
+            <p>STEP 1</p>
           </div>
-        </div>
+          <div class="step" data-step="2">
+            <p>STEP 2</p>
+          </div>
+          <div class="step" data-step="3">
+            <p>STEP 3</p>
+          </div>
+          <div class="step" data-step="4">
+            <p>STEP 4</p>
+          </div>
+        </article>
 
-        <div class="scrolly">
-          <article>
-            <div class="step" data-position="right">
-              <p>Before we dive deeper, let's personalize your experience.</p>
-            </div>
-            <div class="step" data-position="right">
-              <p>What aspects of self-improvement interest you most?</p>
-              <!-- Interactive elements would go here -->
-            </div>
-            <div class="step" data-position="right">
-              <p>
-                Based on your selections, we'll highlight relevant books
-                throughout this journey.
-              </p>
-            </div>
-          </article>
-          <figure>
-            <!-- Visualization canvas will go here -->
-            <div class="canvas-placeholder">
-              <!-- This will be replaced with SVG/Canvas/WebGL later -->
-            </div>
-          </figure>
-        </div>
+        <figure>
+          <p>0</p>
+        </figure>
       </section>
 
-      <!-- Chapter 1 Section -->
-      <section id="chapter1" class="section">
-        <div class="section-title">
-          <div class="scrolly">
-            <article>
-              <div class="step title-step" data-position="center">
-                <h1>Chapter 1</h1>
-                <p>The landscape of self-help literature</p>
-              </div>
-            </article>
-            <figure>
-              <!-- Visualization canvas will go here -->
-              <div class="canvas-placeholder">
-                <!-- This will be replaced with SVG/Canvas/WebGL later -->
-              </div>
-            </figure>
-          </div>
-        </div>
-
-        <div class="scrolly">
-          <article>
-            <div class="step" data-position="left">
-              <p>
-                In this chapter, we'll explore the first visualization of our
-                self-help book dataset.
-              </p>
-            </div>
-            <div class="step" data-position="left">
-              <p>How have self-help topics evolved over time?</p>
-            </div>
-            <div class="step" data-position="left">
-              <p>What patterns emerge when we look at bestselling titles?</p>
-            </div>
-          </article>
-          <figure>
-            <!-- Visualization canvas will go here -->
-            <div class="canvas-placeholder">
-              <!-- This will be replaced with SVG/Canvas/WebGL later -->
-            </div>
-          </figure>
-        </div>
-      </section>
-
-      <!-- Chapter 2 Section -->
-      <section id="chapter2" class="section">
-        <div class="section-title">
-          <div class="scrolly">
-            <article>
-              <div class="step title-step" data-position="center">
-                <h1>Chapter 2</h1>
-                <p>Authors and their influence</p>
-              </div>
-            </article>
-            <figure>
-              <!-- Visualization canvas will go here -->
-              <div class="canvas-placeholder">
-                <!-- This will be replaced with SVG/Canvas/WebGL later -->
-              </div>
-            </figure>
-          </div>
-        </div>
-
-        <div class="scrolly">
-          <article>
-            <div class="step" data-position="center">
-              <p>
-                Who writes self-help books, and what qualifies them as experts?
-              </p>
-            </div>
-            <div class="step" data-position="center">
-              <p>
-                Our second visualization examines the voices behind the advice.
-              </p>
-            </div>
-            <div class="step" data-position="center">
-              <p>
-                Some authors have written dozens of books—what themes connect
-                their work?
-              </p>
-            </div>
-          </article>
-          <figure>
-            <!-- Visualization canvas will go here -->
-            <div class="canvas-placeholder">
-              <!-- This will be replaced with SVG/Canvas/WebGL later -->
-            </div>
-          </figure>
-        </div>
-      </section>
-
-      <!-- Chapter 3 Section -->
-      <section id="chapter3" class="section">
-        <div class="section-title">
-          <div class="scrolly">
-            <article>
-              <div class="step title-step" data-position="center">
-                <h1>Chapter 3</h1>
-                <p>The language of self-improvement</p>
-              </div>
-            </article>
-            <figure>
-              <!-- Visualization canvas will go here -->
-              <div class="canvas-placeholder">
-                <!-- This will be replaced with SVG/Canvas/WebGL later -->
-              </div>
-            </figure>
-          </div>
-        </div>
-
-        <div class="scrolly">
-          <article>
-            <div class="step" data-position="right">
-              <p>
-                What words appear most frequently in self-help titles and
-                descriptions?
-              </p>
-            </div>
-            <div class="step" data-position="right">
-              <p>
-                Our third visualization breaks down the rhetoric of
-                self-improvement.
-              </p>
-            </div>
-            <div class="step" data-position="right">
-              <p>
-                How does the language of self-help shape our understanding of
-                personal growth?
-              </p>
-            </div>
-          </article>
-          <figure>
-            <!-- Visualization canvas will go here -->
-            <div class="canvas-placeholder">
-              <!-- This will be replaced with SVG/Canvas/WebGL later -->
-            </div>
-          </figure>
-        </div>
-      </section>
-
-      <!-- Epilogue Section -->
-      <section id="epilogue" class="section">
-        <div class="section-title">
-          <div class="scrolly">
-            <article>
-              <div class="step title-step" data-position="center">
-                <h1>Epilogue</h1>
-                <p>Reflections on our journey</p>
-              </div>
-            </article>
-            <figure>
-              <!-- Visualization canvas will go here -->
-              <div class="canvas-placeholder">
-                <!-- This will be replaced with SVG/Canvas/WebGL later -->
-              </div>
-            </figure>
-          </div>
-        </div>
-
-        <div class="scrolly">
-          <article>
-            <div class="step" data-position="center">
-              <p>
-                What have we learned about ourselves through this exploration?
-              </p>
-            </div>
-            <div class="step" data-position="center">
-              <p>
-                Self-help books are more than just advice—they're mirrors
-                reflecting our societal values.
-              </p>
-            </div>
-            <div class="step" data-position="center">
-              <p>Thank you for taking this journey with us.</p>
-            </div>
-          </article>
-          <figure>
-            <!-- Visualization canvas will go here -->
-            <div class="canvas-placeholder">
-              <!-- This will be replaced with SVG/Canvas/WebGL later -->
-            </div>
-          </figure>
-        </div>
+      <section id="outro">
+        <h2>End of demonstration</h2>
+        <p>
+          This is a basic implementation of scrollama.js for scrollytelling.
+        </p>
       </section>
     </main>
 
-    <!-- Load libraries -->
     <script src="lib/d3.v7.min.js"></script>
     <script src="lib/scrollama.min.js"></script>
-    <script src="lib/p5.min.js"></script>
-    <!-- Main script -->
-    <script src="js/main.js"></script>
+    <script>
+      // using d3 for convenience
+      const main = d3.select("main");
+      const scrolly = main.select("#scrolly");
+      const figure = scrolly.select("figure");
+      const article = scrolly.select("article");
+      const step = article.selectAll(".step");
+
+      // initialize the scrollama
+      const scroller = scrollama();
+
+      // generic window resize listener event
+      function handleResize() {
+        // 1. update height of step elements
+        const stepH = Math.floor(window.innerHeight * 0.75);
+        step.style("height", stepH + "px");
+
+        const figureHeight = window.innerHeight / 2;
+        const figureMarginTop = (window.innerHeight - figureHeight) / 2;
+
+        figure
+          .style("height", figureHeight + "px")
+          .style("top", figureMarginTop + "px");
+
+        // 3. tell scrollama to update new element dimensions
+        scroller.resize();
+      }
+
+      // scrollama event handlers
+      function handleStepEnter(response) {
+        console.log(response);
+        // response = { element, direction, index }
+
+        // add color to current step only
+        step.classed("is-active", function (d, i) {
+          return i === response.index;
+        });
+
+        // update graphic based on step
+        figure.select("p").text(response.index + 1);
+      }
+
+      function init() {
+        // 1. force a resize on load to ensure proper dimensions are sent to scrollama
+        handleResize();
+
+        // 2. setup the scroller passing options
+        // this will also initialize trigger observations
+        // 3. bind scrollama event handlers (this can be chained like below)
+        scroller
+          .setup({
+            step: "#scrolly article .step",
+            offset: 0.33,
+            debug: false,
+          })
+          .onStepEnter(handleStepEnter);
+
+        // setup resize event
+        window.addEventListener("resize", handleResize);
+      }
+
+      // kick things off
+      init();
+    </script>
   </body>
 </html>
