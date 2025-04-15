@@ -16,13 +16,22 @@
         padding: 0;
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
 
       #chapter-1 {
         width: 100vw;
         height: 100vh;
         background-color: #ffffff;
+      }
+
+      /* Make sure chapter divs are visible */
+      #chapter-2,
+      #chapter-3 {
+        margin: 20px;
+        padding: 20px;
+        border: 1px solid #eee;
       }
     </style>
   </head>
@@ -55,17 +64,25 @@
       </style>
     </div>
 
-    <script>
-      // Load the external JavaScript file that contains the SVG
-      document.addEventListener("DOMContentLoaded", function () {
-        // Create a script element to load the external JS file
-        const script = document.createElement("script");
-        script.src = "chater-2-dev.js";
-        script.type = "text/javascript";
+    <div id="chapter-3"></div>
 
-        // Append the script to the document
-        document.body.appendChild(script);
-      });
+    <script>
+      console.log("Main script started");
+
+      // Add debugging for script loading
+      window.addEventListener(
+        "error",
+        function (e) {
+          console.error("Script error detected:", e.filename, e.message);
+        },
+        true
+      );
     </script>
+
+    <!-- Load chapter-2 script directly -->
+    <script src="chapter-2-dev.js"></script>
+
+    <!-- Load chapter-3 script directly -->
+    <script src="chapter-3-dev.js"></script>
   </body>
 </html>
