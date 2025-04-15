@@ -1,5 +1,14 @@
 // Chapter 3 - 3D Author Visualization
 (function () {
+  // Adjust chapter-3-3d div to fill the viewport
+  const chapter3_3dDiv = document.getElementById("chapter-3-3d");
+  chapter3_3dDiv.style.width = "100vw";
+  chapter3_3dDiv.style.height = "100vh";
+  chapter3_3dDiv.style.margin = "0";
+  chapter3_3dDiv.style.padding = "0";
+  chapter3_3dDiv.style.border = "none";
+  chapter3_3dDiv.style.position = "relative";
+
   // Function to display author data in 3D
   function displayAuthorData3D(data) {
     if (data && data.length > 0) {
@@ -43,7 +52,8 @@
       const layout = {
         title: "Author Data Visualization",
         autosize: true,
-        height: 450,
+        height: chapter3_3dDiv.clientHeight,
+        width: chapter3_3dDiv.clientWidth,
         scene: {
           xaxis: { title: "Number of Books", type: "log" },
           yaxis: { title: "Avg Star Rating" },
@@ -56,6 +66,14 @@
           t: 50,
         },
       };
+
+      // Add window resize event handler for responsive behavior
+      window.addEventListener("resize", function () {
+        Plotly.relayout("chapter-3-3d", {
+          width: chapter3_3dDiv.clientWidth,
+          height: chapter3_3dDiv.clientHeight,
+        });
+      });
 
       Plotly.newPlot("chapter-3-3d", plotData, layout);
     }

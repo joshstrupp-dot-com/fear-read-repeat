@@ -22,13 +22,8 @@
         overflow-y: auto;
       }
 
-      #chapter-1 {
-        width: 100vw;
-        height: 100vh;
-        background-color: #ffffff;
-      }
-
       /* Make sure chapter divs are visible */
+      #chapter-1,
       #chapter-2,
       #chapter-3,
       #chapter-3-3d {
@@ -36,13 +31,11 @@
         padding: 20px;
         border: 1px solid #eee;
       }
-
-      #chapter-3-3d {
-        height: 500px;
-      }
     </style>
   </head>
   <body>
+    <div id="chapter-1"></div>
+
     <div id="chapter-2">
       <button id="expand-chart">Show More Data</button>
       <div class="chart-controls">
@@ -89,6 +82,9 @@
         true
       );
     </script>
+
+    <!-- Load chapter-1 script directly -->
+    <script src="chapter-1-dev.js"></script>
 
     <!-- Load chapter-2 script directly -->
     <script src="chapter-2-dev.js"></script>

@@ -1,10 +1,24 @@
 ///////////////////////////////////////////////////////////// ! Setup and Configuration
 // Immediately Invoked Function Expression to prevent global variable conflicts
 (function () {
-  // Select the chapter-2 div and append an SVG element
+  // Adjust chapter-2 div to fill the viewport
+  const chapter2Div = document.getElementById("chapter-2");
+  chapter2Div.style.width = "100vw";
+  chapter2Div.style.height = "100vh";
+  chapter2Div.style.margin = "0";
+  chapter2Div.style.padding = "0";
+  chapter2Div.style.border = "none";
+  chapter2Div.style.overflow = "hidden";
+  chapter2Div.style.position = "relative";
+
+  // Get the actual dimensions of the container
+  const fullWidth = chapter2Div.clientWidth;
+  const fullHeight = chapter2Div.clientHeight;
+
+  // Set up margins for the chart
   const margin = { top: 40, right: 30, bottom: 60, left: 60 };
-  const width = 800 - margin.left - margin.right;
-  const height = 500 - margin.top - margin.bottom;
+  const width = fullWidth - margin.left - margin.right;
+  const height = fullHeight - margin.top - margin.bottom;
 
   // Global variables to track state
   let currentVisibleCount = 6;
@@ -275,8 +289,9 @@
       svg = d3
         .select("#chapter-2")
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .style("display", "block")
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 

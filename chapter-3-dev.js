@@ -1,19 +1,32 @@
 // Chapter 3 - Author Visualization
 (function () {
+  // Adjust chapter-3 div to fill the viewport
+  const chapter3Div = document.getElementById("chapter-3");
+  chapter3Div.style.width = "100vw";
+  chapter3Div.style.height = "100vh";
+  chapter3Div.style.margin = "0";
+  chapter3Div.style.padding = "0";
+  chapter3Div.style.border = "none";
+  chapter3Div.style.overflow = "hidden";
+  chapter3Div.style.position = "relative";
+
+  // Get the actual dimensions of the container
+  const fullWidth = chapter3Div.clientWidth;
+  const fullHeight = chapter3Div.clientHeight;
+
   // Set up dimensions and margins for the chart
   const margin = { top: 20, right: 20, bottom: 50, left: 60 };
-  const width = 800 - margin.left - margin.right;
-  const height = 400 - margin.top - margin.bottom;
-
-  const chapter3Div = document.getElementById("chapter-3");
+  const width = fullWidth - margin.left - margin.right;
+  const height = fullHeight - margin.top - margin.bottom;
 
   try {
     // Create SVG container
     const svg = d3
       .select("#chapter-3")
       .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .style("display", "block")
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
