@@ -1,3 +1,4 @@
+///////////////////////////////////////////////////////////// ! Setup and Configuration
 // Select the chapter-2 div and append an SVG element
 const margin = { top: 40, right: 30, bottom: 60, left: 60 };
 const width = 800 - margin.left - margin.right;
@@ -14,6 +15,7 @@ let color;
 let categoryData;
 let categories;
 let showCategories = false; // Default to showing problem origin data
+let showPercentage = false; // Default to showing count data
 
 // Function to create safe CSS selector from category name
 function makeSafeSelector(name) {
@@ -21,22 +23,25 @@ function makeSafeSelector(name) {
   return name.replace(/[&]/g, "and").replace(/[^a-zA-Z0-9-_]/g, "-");
 }
 
+///////////////////////////////////////////////////////////// ! Chart Update Function
 // Function to update the chart with new data range
 function updateChart() {
   // Get visible years based on current count
   const visibleYears = years.slice(0, currentVisibleCount);
 
-  // Get max count based on what data is currently visible
+  // Get max count based on what data is currently visible and display mode
   let overallMax;
 
-  if (showCategories) {
-    // Only consider category data
+  if (showPercentage) {
+    overallMax = 100; // Fixed range for percentage mode
+  } else if (showCategories) {
+    // Only consider category data for count mode
     const visibleCatData = categoryData.filter((d) =>
       visibleYears.includes(d.year)
     );
     overallMax = d3.max(visibleCatData, (d) => d.value);
   } else {
-    // Only consider problem origin data
+    // Only consider problem origin data for count mode
     const visibleData = chartData.filter((d) => visibleYears.includes(d.year));
     overallMax = d3.max(visibleData, (d) => Math.max(d.INTERNAL, d.EXTERNAL));
   }
@@ -57,6 +62,9 @@ function updateChart() {
   // Update y-axis with transition
   svg.select(".y-axis").transition().duration(500).call(d3.axisLeft(y));
 
+  // Update y-axis label
+  svg.select(".y-axis-label").text(showPercentage ? "Percentage (%)" : "Count");
+
   // Line generator function
   const line = d3
     .line()
@@ -69,11 +77,24 @@ function updateChart() {
     // Filter data to only visible years for this update
     const visibleLineData = chartData
       .filter((d) => visibleYears.includes(d.year))
-      .map((d) => ({
-        year: d.year,
-        value: d[origin],
-        names: d[`${origin}_names`],
-      }));
+      .map((d) => {
+        if (showPercentage) {
+          // Calculate percentage
+          const total = d.INTERNAL + d.EXTERNAL;
+          const percentage = total > 0 ? (d[origin] / total) * 100 : 0;
+          return {
+            year: d.year,
+            value: percentage,
+            names: d[`${origin}_names`],
+          };
+        } else {
+          return {
+            year: d.year,
+            value: d[origin],
+            names: d[`${origin}_names`],
+          };
+        }
+      });
 
     // Update the actual data line
     svg
@@ -92,12 +113,27 @@ function updateChart() {
       (d) => d.category === category && visibleYears.includes(d.year)
     );
 
+    // Map to percentage values if needed
+    const mappedCatLineData = visibleCatLineData.map((d) => {
+      if (showPercentage) {
+        // Find the year's total across all categories
+        const yearTotal = categoryData
+          .filter((item) => item.year === d.year)
+          .reduce((sum, item) => sum + item.value, 0);
+
+        // Calculate the percentage
+        const percentage = yearTotal > 0 ? (d.value / yearTotal) * 100 : 0;
+        return { ...d, value: percentage };
+      }
+      return d;
+    });
+
     const safeSelector = makeSafeSelector(category);
 
     // Update the line
     svg
       .select(`.line-${safeSelector}`)
-      .datum(visibleCatLineData)
+      .datum(mappedCatLineData)
       .transition()
       .duration(500)
       .attr("d", line)
@@ -113,11 +149,14 @@ function updateChart() {
   }
 
   // Update chart title based on what's shown
-  svg
-    .select(".chart-title")
-    .text(showCategories ? "Categories by Year" : "Problem Origin by Year");
+  let titleText = showCategories
+    ? "Categories by Year"
+    : "Problem Origin by Year";
+  titleText += showPercentage ? " (Percentage)" : " (Count)";
+  svg.select(".chart-title").text(titleText);
 }
 
+///////////////////////////////////////////////////////////// ! Toggle Categories Function
 // Function to toggle between problem origin and categories
 function toggleCategories() {
   showCategories = d3.select("#toggle-categories").property("checked");
@@ -128,6 +167,14 @@ function toggleCategories() {
   d3.selectAll(".category-legend").style("opacity", showCategories ? 1 : 0);
 }
 
+///////////////////////////////////////////////////////////// ! Toggle Percentage Function
+// Function to toggle between count and percentage view
+function togglePercentage() {
+  showPercentage = d3.select("#toggle-percentage").property("checked");
+  updateChart();
+}
+
+///////////////////////////////////////////////////////////// ! Data Loading and Processing
 // Load the CSV file and create a line chart
 d3.csv("data/sh_0415_time/sh_0415_time.csv")
   .then((data) => {
@@ -139,6 +186,7 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
         d.year_bin_5yr !== "9_post-2014"
     );
 
+    ///////////////////////////////////////////////////////////// ! Data Aggregation
     // Group data by year_bin_5yr and problem_origin, and count records
     const groupedData = d3.rollup(
       filteredData,
@@ -166,6 +214,7 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
       ...new Set(filteredData.map((d) => d.key_cat_primary_agg)),
     ].filter(Boolean);
 
+    ///////////////////////////////////////////////////////////// ! Data Transformation
     // Convert the nested Map to an array format suitable for lines
     years = Array.from(groupedData.keys()).sort();
     chartData = years.map((year) => {
@@ -214,7 +263,7 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
       Math.max(d.INTERNAL, d.EXTERNAL)
     );
 
-    // Create SVG
+    ///////////////////////////////////////////////////////////// ! Create SVG
     svg = d3
       .select("#chapter-2")
       .append("svg")
@@ -223,10 +272,12 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    ///////////////////////////////////////////////////////////// ! Scales Definition
     // Set up scales
     x = d3.scaleBand().domain(visibleYears).range([0, width]).padding(0.2);
     y = d3.scaleLinear().domain([0, visibleMax]).range([height, 0]);
 
+    ///////////////////////////////////////////////////////////// ! Axes Creation
     // Add x-axis
     svg
       .append("g")
@@ -250,12 +301,14 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
     // Add y-axis label
     svg
       .append("text")
+      .attr("class", "y-axis-label")
       .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
       .attr("y", -margin.left + 15)
       .style("text-anchor", "middle")
       .text("Count");
 
+    ///////////////////////////////////////////////////////////// ! Color Scales
     // Color scale for origin
     const originColors = ["#4682b4", "#ff7f50"];
 
@@ -265,6 +318,7 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
       .domain([...["INTERNAL", "EXTERNAL"], ...categories])
       .range([...originColors, ...d3.schemeCategory10]);
 
+    ///////////////////////////////////////////////////////////// ! Line Creation
     // Create the lines
     const line = d3
       .line()
@@ -316,6 +370,7 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
         .style("opacity", 0); // Hidden by default
     });
 
+    ///////////////////////////////////////////////////////////// ! Legend Creation
     // Add legend
     const legend = svg
       .append("g")
@@ -363,6 +418,7 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
         .style("font-size", "10px");
     });
 
+    ///////////////////////////////////////////////////////////// ! Title and Controls
     // Add title
     svg
       .append("text")
@@ -381,10 +437,12 @@ d3.csv("data/sh_0415_time/sh_0415_time.csv")
       }
     });
 
-    // Set checkbox to unchecked by default
+    // Set checkboxes to unchecked by default
     d3.select("#toggle-categories").property("checked", false);
+    d3.select("#toggle-percentage").property("checked", false);
 
-    // Add toggle handler
+    // Add toggle handlers
     d3.select("#toggle-categories").on("change", toggleCategories);
+    d3.select("#toggle-percentage").on("change", togglePercentage);
   })
   .catch((error) => console.error("Error loading CSV:", error));

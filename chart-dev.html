@@ -27,27 +27,33 @@
     </style>
   </head>
   <body>
-    <div id="chapter-2"></div>
-    <button id="expand-chart">Show More Data</button>
-    <div class="chart-controls">
-      <label for="toggle-categories">
-        <input type="checkbox" id="toggle-categories" />
-        Show Categories
-      </label>
+    <div id="chapter-2">
+      <button id="expand-chart">Show More Data</button>
+      <div class="chart-controls">
+        <label for="toggle-categories">
+          <input type="checkbox" id="toggle-categories" />
+          Show Categories
+        </label>
+        <label for="toggle-percentage">
+          <input type="checkbox" id="toggle-percentage" />
+          Show Percentage
+        </label>
+      </div>
+      <style>
+        .chart-controls {
+          margin: 10px 0;
+        }
+        .chart-controls label {
+          display: inline-flex;
+          align-items: center;
+          cursor: pointer;
+          margin-right: 15px;
+        }
+        .chart-controls input[type="checkbox"] {
+          margin-right: 5px;
+        }
+      </style>
     </div>
-    <style>
-      .chart-controls {
-        margin: 10px 0;
-      }
-      .chart-controls label {
-        display: inline-flex;
-        align-items: center;
-        cursor: pointer;
-      }
-      .chart-controls input[type="checkbox"] {
-        margin-right: 5px;
-      }
-    </style>
 
     <script>
       // Load the external JavaScript file that contains the SVG
