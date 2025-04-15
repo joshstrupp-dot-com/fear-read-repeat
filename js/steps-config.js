@@ -63,21 +63,54 @@ const stepsConfig = [
     },
   },
   {
-    id: "analysis",
+    id: "chapter-2",
     text: "STEP 2",
     fullwidth: false,
-    visualizationId: "analysis-viz", // Different ID - will create new visualization
+    visualizationId: "chapter-2-viz", // Different ID - will create new visualization
+    // render: () => {
+    //   const figure = d3.select("#figure-container");
+
+    //   // Different visualization ID, so create new visualization
+    //   if (window.currentVisualizationId !== "analysis-viz") {
+    //     figure.html("");
+    //     figure.style("background-color", "#1e88e5");
+    //     figure.append("p").text("2");
+
+    //     window.currentVisualizationId = "analysis-viz";
+    //   }
+    // },
     render: () => {
       const figure = d3.select("#figure-container");
 
-      // Different visualization ID, so create new visualization
-      if (window.currentVisualizationId !== "analysis-viz") {
+      // Only initialize if this is a new visualization or none exists
+      if (
+        !window.currentVisualizationId ||
+        window.currentVisualizationId !== "chapter-2-viz"
+      ) {
         figure.html("");
-        figure.style("background-color", "#1e88e5");
-        figure.append("p").text("2");
 
-        window.currentVisualizationId = "analysis-viz";
+        // Create a container for the script
+        const scriptContainer = figure
+          .append("div")
+          .attr("id", "chapter-2")
+          .style("width", "100%")
+          .style("height", "100%");
+        const script = document.createElement("script");
+        script.src = "chapter-2-dev.js";
+        script.async = true;
+
+        // Append the script to the container
+        scriptContainer.node().appendChild(script);
+
+        // Update current visualization ID
+        window.currentVisualizationId = "chapter-2-viz";
       }
+
+      // Trigger step-specific updates via event
+      const event = new CustomEvent("visualizationUpdate", {
+        detail: { step: "placeholder" },
+      });
+      document.dispatchEvent(event);
     },
   },
   {
