@@ -29,6 +29,25 @@
   <body>
     <div id="chapter-2"></div>
     <button id="expand-chart">Show More Data</button>
+    <div class="chart-controls">
+      <label for="toggle-categories">
+        <input type="checkbox" id="toggle-categories" />
+        Show Categories
+      </label>
+    </div>
+    <style>
+      .chart-controls {
+        margin: 10px 0;
+      }
+      .chart-controls label {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+      }
+      .chart-controls input[type="checkbox"] {
+        margin-right: 5px;
+      }
+    </style>
 
     <script>
       // Load the external JavaScript file that contains the SVG
