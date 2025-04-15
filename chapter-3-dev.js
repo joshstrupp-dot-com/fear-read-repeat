@@ -37,7 +37,7 @@
 
         const yScale = d3
           .scaleLinear()
-          .domain([0, d3.max(data, (d) => d.avg_star_rating)])
+          .domain([2.3, d3.max(data, (d) => d.avg_star_rating)])
           .nice()
           .range([height, 0]);
 
@@ -93,7 +93,11 @@
           .attr("cx", (d) => xScale(d.author_num_books))
           .attr("cy", (d) => yScale(d.avg_star_rating))
           .attr("r", 5)
-          .style("fill", (d) => colorScale(d.avg_cred_score))
+          .style("fill", (d) =>
+            d.avg_cred_score === 0
+              ? "rgba(0,0,0,0.1)"
+              : colorScale(d.avg_cred_score)
+          )
           .style("stroke", (d) => (d.bt_count > 0 ? "black" : "none"))
           .style("stroke-width", 1.5)
           .on("mouseover", function (event, d) {

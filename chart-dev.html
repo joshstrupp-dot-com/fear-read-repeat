@@ -7,6 +7,8 @@
 
     <!-- D3.js from CDN -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Plotly.js for 3D visualization -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <style>
       /* Reset default margins and padding */
@@ -28,10 +30,15 @@
 
       /* Make sure chapter divs are visible */
       #chapter-2,
-      #chapter-3 {
+      #chapter-3,
+      #chapter-3-3d {
         margin: 20px;
         padding: 20px;
         border: 1px solid #eee;
+      }
+
+      #chapter-3-3d {
+        height: 500px;
       }
     </style>
   </head>
@@ -66,6 +73,10 @@
 
     <div id="chapter-3"></div>
 
+    <div id="chapter-3-3d">
+      <h3>Author Data - 3D Visualization</h3>
+    </div>
+
     <script>
       console.log("Main script started");
 
@@ -84,5 +95,8 @@
 
     <!-- Load chapter-3 script directly -->
     <script src="chapter-3-dev.js"></script>
+
+    <!-- Load chapter-3-3d script directly -->
+    <script src="chapter-3-3d.js"></script>
   </body>
 </html>
