@@ -17,6 +17,16 @@ const stepsConfig = [
     },
   },
   {
+    id: "intro",
+    text: "Here is a step",
+    render: () => {
+      // Simple text rendering
+      const figure = d3.select("#figure-container");
+      figure.html("");
+      figure.append("p").text("1");
+    },
+  },
+  {
     id: "analysis",
     text: "STEP 2",
     render: () => {
@@ -35,10 +45,12 @@ const stepsConfig = [
       const figure = d3.select("#figure-container");
       figure.html("");
       figure.style("background-color", "#8a8a8a");
-      figure.append("p").text("3");
+      // figure.append("p").text("3");
 
       // Alternative: inserting SVG
-      // figure.html('<svg width="100%" height="100%"><circle cx="50%" cy="50%" r="40%" fill="red"></circle></svg>');
+      figure.html(
+        '<svg width="100%" height="100%"><circle cx="50%" cy="50%" r="40%" fill="red"></circle></svg>'
+      );
     },
   },
   {

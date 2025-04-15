@@ -134,6 +134,9 @@ function loadSteps() {
     try {
       const parsed = JSON.parse(savedSteps);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        // Add console log to show when steps are loaded from localStorage
+        console.log(`Loading ${parsed.length} steps from localStorage`, parsed);
+
         // We need to preserve the render functions when rehydrating saved steps
         const newConfig = [];
 

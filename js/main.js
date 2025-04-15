@@ -26,12 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const stepH = Math.floor(window.innerHeight * 0.75);
     step.style("height", stepH + "px");
 
-    const figureHeight = window.innerHeight / 2;
-    const figureMarginTop = (window.innerHeight - figureHeight) / 2;
-
-    figure
-      .style("height", figureHeight + "px")
-      .style("top", figureMarginTop + "px");
+    // Set figure to take up full viewport height with padding
+    figure.style("height", "calc(100vh - 2rem)").style("top", "1rem");
 
     // 3. Tell scrollama to update new element dimensions
     scroller.resize();

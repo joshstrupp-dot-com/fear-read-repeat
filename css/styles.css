@@ -32,6 +32,7 @@ body {
   display: flex;
   background-color: #f3f3f3;
   padding: 1rem;
+  min-height: 100vh;
 }
 
 #scrolly > * {
@@ -47,6 +48,8 @@ article {
 figure {
   position: sticky;
   width: 100%;
+  height: calc(100vh - 2rem);
+  top: 1rem;
   margin: 0;
   transform: translate3d(0, 0, 0);
   background-color: #8a8a8a;
