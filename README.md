@@ -1,6 +1,6 @@
 # Fear. Read. Repeat.
-## Visualizing the impact of self-help literature on the American psyche.
-### By Josh Strupp // Parsons School of Design // 2025 M.S. Data Visualization
+### Visualizing the impact of self-help literature on the American psyche.
+By Josh Strupp // Parsons School of Design // 2025 M.S. Data Visualization
 
 ## Abstract
 Self-help is everywhere—books, podcasts, seminars—and whether we realize it or not, most of us are consuming it. But behind the advice to “optimize your life” lies something more insidious: a genre that often blames individuals for systemic problems, often profiting off our insecurities. This thesis examines American self-help literature—its rise, its authors, and its cultural influence—through the lens of a Goodreads dataset.
