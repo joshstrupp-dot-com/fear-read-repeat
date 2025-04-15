@@ -4,13 +4,19 @@
  */
 
 // Maintain references to key DOM elements and scrollama
-let figure, stepsContainer, scroller;
+let figure, stepsContainer, scroller, scrolly;
 
 // Initialize utils with references to DOM elements
-function initScrollyUtils(figureRef, stepsContainerRef, scrollerRef) {
+function initScrollyUtils(
+  figureRef,
+  stepsContainerRef,
+  scrollerRef,
+  scrollyRef
+) {
   figure = figureRef;
   stepsContainer = stepsContainerRef;
   scroller = scrollerRef;
+  scrolly = scrollyRef;
 }
 
 // Create steps from configuration
@@ -38,12 +44,17 @@ function handleStepEnter(response) {
     return i === response.index;
   });
 
-  // Call the appropriate render function for this step
-  if (
-    window.stepsConfig[response.index] &&
-    window.stepsConfig[response.index].render
-  ) {
-    window.stepsConfig[response.index].render();
+  // Toggle fullwidth class based on step configuration
+  const isFullWidth = window.stepsConfig[response.index]?.fullwidth || false;
+  figure.classed("fullwidth", isFullWidth);
+  scrolly.classed("fullwidth-active", isFullWidth);
+
+  // Get current step config
+  const currentStep = window.stepsConfig[response.index];
+
+  // Call the render function for this step
+  if (currentStep && currentStep.render) {
+    currentStep.render();
   }
 }
 

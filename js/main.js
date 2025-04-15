@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const scroller = scrollama();
 
   // Initialize utils with DOM references
-  initScrollyUtils(figure, stepsContainer, scroller);
+  initScrollyUtils(figure, stepsContainer, scroller, scrolly);
 
   // Generic window resize listener event
   function handleResize() {
@@ -34,13 +34,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function init() {
-    // Check for saved steps
-    const hasSavedSteps = window.scrollyTools.loadSteps();
+    // Clear localStorage to always use the configuration from steps-config.js
+    localStorage.removeItem("scrollySteps");
 
-    if (!hasSavedSteps) {
-      // Create fresh steps if none were loaded
-      window.scrollyTools.createSteps();
-    }
+    // Always create fresh steps from the configuration
+    window.scrollyTools.createSteps();
 
     // Set up resize handling
     handleResize();

@@ -71,6 +71,10 @@
     .scaleExtent([1, 10])
     .on("zoom", (event) => {
       g.attr("transform", event.transform);
+    })
+    .filter((event) => {
+      // Disable mouse wheel/scroll zooming
+      return !event.type.includes("wheel");
     });
 
   // Apply zoom behavior to svg
@@ -235,4 +239,35 @@
     }));
     displayData(fakeData);
   }
+  // Near the end of chapter-1-dev.js
+  document.addEventListener("visualizationUpdate", (event) => {
+    const stepId = event.detail.step;
+
+    // Apply step-specific changes to your visualization
+    if (stepId === "intro") {
+      // Reset/initial view
+      svg
+        .transition()
+        .duration(750)
+        .call(
+          zoom.transform,
+          d3.zoomIdentity.translate(margin.left, margin.top).scale(1)
+        );
+      zoomedIn = false;
+      g.selectAll("rect").attr("fill", "#69b3a2");
+    } else if (stepId === "intro-2") {
+      // Maybe zoom in to a specific area for step 1.5
+      const centerX = chartWidth / 3;
+      const centerY = chartHeight / 3;
+
+      // Transition to a specific view
+      const transform = d3.zoomIdentity
+        .translate(width / 2, height / 2)
+        .scale(3)
+        .translate(-centerX, -centerY);
+
+      svg.transition().duration(1000).call(zoom.transform, transform);
+      zoomedIn = true;
+    }
+  });
 })();
