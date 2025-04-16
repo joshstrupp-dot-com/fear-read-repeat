@@ -31,6 +31,7 @@ const stepsConfig = [
     id: "self-help",
     text: "This advice is called self-help. Like it or not, realize it or not — you're probably a consumer of self-help.",
     fullwidth: true,
+    customClass: "statement",
     render: () => {
       const figure = d3.select("#figure-container");
       figure.html("");

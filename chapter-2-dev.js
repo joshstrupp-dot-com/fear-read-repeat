@@ -476,7 +476,7 @@
 
     // Show only 1855-1859
     if (stepId === "samuel-smiles") {
-      currentVisibleCount = 1;
+      currentVisibleCount = 2;
       updateChart();
     } else if (stepId === "turn-of-century") {
       // Show all available years
