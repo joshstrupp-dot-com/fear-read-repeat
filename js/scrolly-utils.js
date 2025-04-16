@@ -24,11 +24,15 @@ function createSteps() {
   stepsContainer.html(""); // Clear existing steps
 
   window.stepsConfig.forEach((step) => {
-    stepsContainer
+    const stepElement = stepsContainer
       .append("div")
       .attr("class", "step")
       .attr("data-step", step.id)
       .html(`<p>${step.text}</p>`);
+    // Apply custom class if specified
+    if (step.customClass) {
+      stepElement.classed(step.customClass, true);
+    }
   });
 
   return stepsContainer.selectAll(".step");
