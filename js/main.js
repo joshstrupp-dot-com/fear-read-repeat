@@ -22,9 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Get current step elements
     const step = stepsContainer.selectAll(".step");
 
-    // 1. Update height of step elements
-    const stepH = Math.floor(window.innerHeight * 0.75);
-    step.style("height", stepH + "px");
+    // Set vertical margin between steps to 75vh
+    const verticalMargin = Math.floor(window.innerHeight * 0.5);
+    step.style("margin-bottom", `${verticalMargin}px`);
+
+    // But remove margin from last step
+    step
+      .filter((d, i, nodes) => i === nodes.length - 1)
+      .style("margin-bottom", "0px");
 
     // Set figure to take up full viewport height with padding
     figure.style("height", "calc(100vh - 2rem)").style("top", "1rem");
@@ -40,12 +45,31 @@ document.addEventListener("DOMContentLoaded", () => {
     // Always create fresh steps from the configuration
     window.scrollyTools.createSteps();
 
+    // Add specific styling for first step to position it at the top
+    stepsContainer.select(".step:first-child").style("margin-top", "0");
+
     // Set up resize handling
     handleResize();
     window.addEventListener("resize", handleResize);
 
     // Initialize scrollama
     window.scrollyTools.updateScrollama();
+
+    // Trigger the first step's visualization immediately on load
+    if (window.stepsConfig && window.stepsConfig.length > 0) {
+      // Add active class to first step
+      stepsContainer.select(".step:first-child").classed("is-active", true);
+
+      // Render the first step's visualization
+      const firstStep = window.stepsConfig[0];
+      if (firstStep && firstStep.render) {
+        firstStep.render();
+      }
+
+      // Apply fullwidth class if needed
+      figure.classed("fullwidth", firstStep.fullwidth || false);
+      scrolly.classed("fullwidth-active", firstStep.fullwidth || false);
+    }
   }
 
   // Start the application

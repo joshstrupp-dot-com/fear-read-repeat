@@ -9,6 +9,24 @@ body {
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   line-height: 1.5;
   color: #333;
+  background-color: #f3f1ed;
+}
+
+/* Hero Section */
+#hero {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  background-image: url("../preview.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 #intro {
@@ -30,9 +48,10 @@ body {
 #scrolly {
   position: relative;
   display: flex;
-  background-color: #f3f3f3;
+  /* background-color: #f3f1ed; */
   padding: 1rem;
   min-height: 100vh;
+  margin-left: 2.6rem;
 }
 
 #scrolly > * {
@@ -41,9 +60,10 @@ body {
 
 article {
   position: relative;
-  padding: 0 1rem;
+  padding: 1rem 1rem 0 1rem;
   max-width: 20rem;
   z-index: 1;
+  min-height: 200vh;
 }
 
 figure {
@@ -53,7 +73,7 @@ figure {
   top: 1rem;
   margin: 0;
   transform: translate3d(0, 0, 0);
-  background-color: #8a8a8a;
+  /* background-color: #8a8a8a; */
   z-index: 0;
 }
 
@@ -78,32 +98,41 @@ figure p {
 }
 
 .step {
-  margin: 0 auto 2rem auto;
-  background-color: #3b3b3b;
-  color: #fff;
+  margin: 0 auto;
+  display: inline-flex;
+  padding: 32px;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid #000;
+  background: url(../assets/paper.eps) lightgray 0% 0% / 154.22531366348267px
+      154.22531366348267px repeat,
+    radial-gradient(
+      151.92% 127.02% at 15.32% 21.04%,
+      rgba(246, 244, 238, 0.75) 0%,
+      rgba(246, 244, 238, 0.75) 77.08%,
+      rgba(245, 243, 237, 0.75) 100%
+    );
+  background-blend-mode: overlay, normal;
+  backdrop-filter: blur(40px);
+  color: #333;
+  /* Remove vertical positioning that pushed steps down */
+  /* position: relative; */
+  /* top: 50%; */
 }
 
 .step:last-child {
   margin-bottom: 0;
 }
 
-.step.is-active {
-  background-color: goldenrod;
-  color: #3b3b3b;
-}
-
 .step p {
-  text-align: center;
-  padding: 1rem;
-  font-size: 1.5rem;
-}
-
-.fullwidth-active .step {
-  background-color: rgba(59, 59, 59, 0.8);
-}
-
-.fullwidth-active .step.is-active {
-  background-color: rgba(218, 165, 32, 0.9);
+  text-align: left;
+  color: #000;
+  font-family: "Libre Caslon Display", serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 25px;
 }
 
 #outro {

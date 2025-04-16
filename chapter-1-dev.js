@@ -254,13 +254,13 @@
           d3.zoomIdentity.translate(margin.left, margin.top).scale(1)
         );
       zoomedIn = false;
-      g.selectAll("rect").attr("fill", "#69b3a2");
+      g.selectAll("rect").attr("fill", "#fff");
     } else if (stepId === "intro-2") {
-      // Maybe zoom in to a specific area for step 1.5
+      // Zoom in to a specific area
       const centerX = chartWidth / 3;
       const centerY = chartHeight / 3;
 
-      // Transition to a specific view
+      // Transition to a zoomed view
       const transform = d3.zoomIdentity
         .translate(width / 2, height / 2)
         .scale(3)
@@ -268,6 +268,12 @@
 
       svg.transition().duration(1000).call(zoom.transform, transform);
       zoomedIn = true;
+    } else if (stepId === "goodreads-data") {
+      // Remove our visualization when moving to the next section
+      const chapter1Div = document.getElementById("chapter-1");
+      if (chapter1Div) {
+        chapter1Div.innerHTML = "";
+      }
     }
   });
 })();

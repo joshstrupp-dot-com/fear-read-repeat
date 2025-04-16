@@ -58,12 +58,41 @@ function handleStepEnter(response) {
   }
 }
 
+// Generic window resize listener event
+function handleResize() {
+  // Get current step elements
+  const step = stepsContainer.selectAll(".step");
+
+  // Calculate viewport height
+  const viewportHeight = window.innerHeight;
+
+  // Position first step 75% down the viewport
+  step
+    .filter((d, i) => i === 0)
+    .style("margin-top", `${Math.floor(viewportHeight * 0.75)}px`);
+
+  // Set vertical margin between steps
+  const verticalMargin = Math.floor(viewportHeight * 0.5);
+  step.style("margin-bottom", `${verticalMargin}px`);
+
+  // But remove margin from last step
+  step
+    .filter((d, i, nodes) => i === nodes.length - 1)
+    .style("margin-bottom", "0px");
+
+  // Set figure to take up full viewport height with padding
+  figure.style("height", "calc(100vh - 2rem)").style("top", "1rem");
+
+  // Tell scrollama to update new element dimensions
+  scroller.resize();
+}
+
 // Update scrollama setup
 function updateScrollama() {
   scroller
     .setup({
       step: "#scrolly article .step",
-      offset: 0.33,
+      offset: 0.75, // Set to 75% down the viewport
       debug: false,
     })
     .onStepEnter(handleStepEnter);

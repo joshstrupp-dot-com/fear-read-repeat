@@ -9,135 +9,148 @@
  */
 const stepsConfig = [
   {
-    id: "intro",
-    text: "STEP 1",
+    id: "life-sucks",
+    text: "Life can really suck. Advice can help. And there is no shortage of advice.",
     fullwidth: true,
-    visualizationId: "chapter-1-viz",
     render: () => {
       const figure = d3.select("#figure-container");
-
-      // Only initialize if this is a new visualization or none exists
-      if (
-        !window.currentVisualizationId ||
-        window.currentVisualizationId !== "chapter-1-viz"
-      ) {
-        figure.html("");
-
-        // Create a container for the script
-        const scriptContainer = figure
-          .append("div")
-          .attr("id", "chapter-1")
-          .style("width", "100%")
-          .style("height", "100%");
-
-        // Load and execute chapter-1-dev.js
-        const script = document.createElement("script");
-        script.src = "chapter-1-dev.js";
-        script.async = true;
-
-        // Append the script to the container
-        scriptContainer.node().appendChild(script);
-
-        // Update current visualization ID
-        window.currentVisualizationId = "chapter-1-viz";
-      }
-
-      // Trigger step-specific updates via event
-      const event = new CustomEvent("visualizationUpdate", {
-        detail: { step: "intro" },
-      });
-      document.dispatchEvent(event);
+      figure.html("");
+      figure
+        .append("div")
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("align-items", "center")
+        .style("font-size", "2rem")
+        .style("text-align", "center")
+        .style("color", "white")
+        .text("Intro statement");
     },
   },
   {
-    id: "intro-2",
-    text: "STEP 1.5",
-    fullwidth: true,
-    visualizationId: "chapter-1-viz", // Same as previous step - will reuse visualization
-    render: () => {
-      // No need to reinitialize - just update the existing visualization
-      const event = new CustomEvent("visualizationUpdate", {
-        detail: { step: "intro-2" },
-      });
-      document.dispatchEvent(event);
-    },
-  },
-  {
-    id: "chapter-2",
-    text: "STEP 2",
+    id: "quick-fixes",
+    text: "You're a few keystrokes from fixing your marriage. You're one Amazon order from never aging again. You're 8 minutes from knowing all of Wall Street's secrets (or 4 minutes if you watch on 2x).",
     fullwidth: false,
-    visualizationId: "chapter-2-viz", // Different ID - will create new visualization
-    // render: () => {
-    //   const figure = d3.select("#figure-container");
-
-    //   // Different visualization ID, so create new visualization
-    //   if (window.currentVisualizationId !== "analysis-viz") {
-    //     figure.html("");
-    //     figure.style("background-color", "#1e88e5");
-    //     figure.append("p").text("2");
-
-    //     window.currentVisualizationId = "analysis-viz";
-    //   }
-    // },
     render: () => {
       const figure = d3.select("#figure-container");
-
-      // Only initialize if this is a new visualization or none exists
-      if (
-        !window.currentVisualizationId ||
-        window.currentVisualizationId !== "chapter-2-viz"
-      ) {
-        figure.html("");
-
-        // Create a container for the script
-        const scriptContainer = figure
-          .append("div")
-          .attr("id", "chapter-2")
-          .style("width", "100%")
-          .style("height", "100%");
-        const script = document.createElement("script");
-        script.src = "chapter-2-dev.js";
-        script.async = true;
-
-        // Append the script to the container
-        scriptContainer.node().appendChild(script);
-
-        // Update current visualization ID
-        window.currentVisualizationId = "chapter-2-viz";
-      }
-
-      // Trigger step-specific updates via event
-      const event = new CustomEvent("visualizationUpdate", {
-        detail: { step: "placeholder" },
-      });
-      document.dispatchEvent(event);
+      figure.html("");
+      figure
+        .append("div")
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("align-items", "center")
+        .style("font-size", "2rem")
+        .style("text-align", "center")
+        .style("color", "white")
+        .text(
+          "stylized slew of youtube talking heads, podcasters, self help articles, etc."
+        );
     },
   },
   {
-    id: "results",
-    text: "STEP 3",
+    id: "self-help",
+    text: "This advice is called self-help. Like it or not, realize it or not — you're probably a consumer of self-help.",
     fullwidth: true,
     render: () => {
-      // Example with SVG content
+      const figure = d3.select("#figure-container");
+      figure.html("");
+      figure
+        .append("div")
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("align-items", "center")
+        .style("font-size", "2rem")
+        .style("text-align", "center")
+        .style("color", "white")
+        .text("same as above or blank");
+    },
+  },
+
+  {
+    id: "fastest-growing",
+    text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013.",
+    fullwidth: true,
+    render: () => {
+      // Clear existing content
       const figure = d3.select("#figure-container");
       figure.html("");
 
-      // Alternative: inserting SVG - make the circle white to be visible
-      figure.html(
-        '<svg width="100%" height="100%"><circle cx="50%" cy="50%" r="40%" fill="white"></circle><text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="#333" font-size="8rem" font-weight="900">3</text></svg>'
+      // Create a container for the chapter-1 visualization
+      const vizContainer = figure
+        .append("div")
+        .attr("id", "chapter-1")
+        .style("width", "100%")
+        .style("height", "100%");
+
+      // Load and execute chapter-1-dev.js
+      const script = document.createElement("script");
+      script.src = "chapter-1-dev.js";
+      document.body.appendChild(script);
+
+      // Dispatch an initialization event
+      setTimeout(() => {
+        document.dispatchEvent(
+          new CustomEvent("visualizationUpdate", {
+            detail: { step: "intro" },
+          })
+        );
+      }, 100);
+    },
+  },
+  {
+    id: "blame-game",
+    text: "There are titles that claim your dead-end job is your fault and yours to fix; that you're depressed because you're not doing enough squat jumps; that you can't connect with your child unless you follow these \"ten steps to tame your teen.\"",
+    fullwidth: true,
+    render: () => {
+      // Keep the existing visualization but trigger the zoom update
+      document.dispatchEvent(
+        new CustomEvent("visualizationUpdate", {
+          detail: { step: "intro-2" },
+        })
       );
     },
   },
+
   {
-    id: "conclusion",
-    text: "STEP 4",
-    fullwidth: false,
+    id: "systemic-problems",
+    text: "So much of self-help suggests you're not doing enough, which, in my opinion, isn't cool. Our anxieties are often the result of events outside of our control and some authors efforts to, in the words of scholar Beth Blum in her book The Self-Help Compulsion, \"privatize solutions to systemic problems.\"",
+    fullwidth: true,
     render: () => {
-      // Return to default state
+      // Keep the existing visualization in its zoomed state
+      // No need to dispatch a new event as we want to maintain the same view as "blame-game"
+    },
+  },
+  {
+    id: "goodreads-data",
+    text: "From a Goodreads dataset featuring tens of thousands of books, we will explore how the self help industry took advantage of neoliberal shifts in self care, how (western) world events — not our inability to pray more or take ashwaganda — are at the root of our fears, and which authors may be cashing in.",
+    fullwidth: true,
+    render: () => {
+      // Clear any existing visualization
+      document.dispatchEvent(
+        new CustomEvent("visualizationUpdate", {
+          detail: { step: "goodreads-data" },
+        })
+      );
+
+      // Set up the placeholder display
       const figure = d3.select("#figure-container");
       figure.html("");
-      figure.style("background-color", "#8a8a8a");
-      figure.append("p").text("4");
+      figure
+        .append("div")
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("align-items", "center")
+        .style("font-size", "2rem")
+        .style("text-align", "center")
+        .style("color", "white")
+        .text("placeholder for Goodreads dataset analysis");
     },
   },
 ];
