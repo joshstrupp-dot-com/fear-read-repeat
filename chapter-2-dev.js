@@ -4,7 +4,7 @@
   // Adjust chapter-2 div to fill the viewport
   const chapter2Div = document.getElementById("chapter-2");
   chapter2Div.style.width = "100vw";
-  chapter2Div.style.height = "100vh";
+  chapter2Div.style.height = "90vh";
   chapter2Div.style.margin = "0";
   chapter2Div.style.padding = "0";
   chapter2Div.style.border = "none";
@@ -470,35 +470,43 @@
     })
     .catch((error) => console.error("Error loading CSV:", error));
 
-  // // Near the end of chapter-2-dev.js
-  // document.addEventListener("visualizationUpdate", (event) => {
-  //   const stepId = event.detail.step;
+  // Near the end of chapter-2-dev.js
+  document.addEventListener("visualizationUpdate", (event) => {
+    const stepId = event.detail.step;
 
-  //   // Apply step-specific changes to your visualization
-  //   if (stepId === "placeholder") {
-  //     // Reset/initial view
-  //     svg
-  //       .transition()
-  //         .duration(750)
-  //         .call(
-  //           zoom.transform,
-  //           d3.zoomIdentity.translate(margin.left, margin.top).scale(1)
-  //         );
-  //       zoomedIn = false;
-  //       g.selectAll("rect").attr("fill", "#69b3a2");
-  //     } else if (stepId === "intro-2") {
-  //       // Maybe zoom in to a specific area for step 1.5
-  //       const centerX = chartWidth / 3;
-  //       const centerY = chartHeight / 3;
-
-  //       // Transition to a specific view
-  //       const transform = d3.zoomIdentity
-  //         .translate(width / 2, height / 2)
-  //         .scale(3)
-  //         .translate(-centerX, -centerY);
-
-  //       svg.transition().duration(1000).call(zoom.transform, transform);
-  //       zoomedIn = true;
-  //     }
-  //   });
+    // Show only 1855-1859
+    if (stepId === "samuel-smiles") {
+      currentVisibleCount = 2;
+      updateChart();
+    } else if (stepId === "turn-of-century") {
+      // Show all available years
+      currentVisibleCount = 8;
+      updateChart();
+    } else if (stepId === "through-ww1") {
+      // Show years through World War I
+      currentVisibleCount = 10;
+      updateChart();
+    } else if (stepId === "post-20s") {
+      // Show years through post-1920s
+      currentVisibleCount = 16;
+      updateChart();
+    } else if (stepId === "post-ww2") {
+      // Show years through post-1940s
+      currentVisibleCount = 23;
+      updateChart();
+    }
+    // neoliberal-shift that takes us to visible count through 1994, which is visible count of 26
+    else if (stepId === "neoliberal-shift") {
+      currentVisibleCount = 26;
+      updateChart();
+    } else if (stepId === "self-as-battlefield") {
+      // Show years through 1994
+      currentVisibleCount = 26;
+      updateChart();
+    } else if (stepId === "all-years") {
+      // Show all available years
+      currentVisibleCount = years.length;
+      updateChart();
+    }
+  });
 })();

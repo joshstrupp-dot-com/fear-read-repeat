@@ -69,6 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // Apply fullwidth class if needed
       figure.classed("fullwidth", firstStep.fullwidth || false);
       scrolly.classed("fullwidth-active", firstStep.fullwidth || false);
+
+      // Apply centered-statement class if needed
+      stepsContainer
+        .select(".step:first-child")
+        .classed("centered-statement", firstStep.centerStatement || false);
     }
   }
 
