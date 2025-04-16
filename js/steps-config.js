@@ -73,7 +73,7 @@ const stepsConfig = [
 
   {
     id: "fastest-growing",
-    text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013.",
+    text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013. There are millions of books out there, but today we'll focus on the 20,000 most read books on Goodreads.",
     fullwidth: true,
     render: () => {
       // Clear existing content
@@ -123,34 +123,6 @@ const stepsConfig = [
     render: () => {
       // Keep the existing visualization in its zoomed state
       // No need to dispatch a new event as we want to maintain the same view as "blame-game"
-    },
-  },
-  {
-    id: "goodreads-data",
-    text: "From a Goodreads dataset featuring tens of thousands of books, we will explore how the self help industry took advantage of neoliberal shifts in self care, how (western) world events — not our inability to pray more or take ashwaganda — are at the root of our fears, and which authors may be cashing in.",
-    fullwidth: true,
-    render: () => {
-      // Clear any existing visualization
-      document.dispatchEvent(
-        new CustomEvent("visualizationUpdate", {
-          detail: { step: "goodreads-data" },
-        })
-      );
-
-      // Set up the placeholder display
-      const figure = d3.select("#figure-container");
-      figure.html("");
-      figure
-        .append("div")
-        .style("width", "100%")
-        .style("height", "100%")
-        .style("display", "flex")
-        .style("justify-content", "center")
-        .style("align-items", "center")
-        .style("font-size", "2rem")
-        .style("text-align", "center")
-        .style("color", "white")
-        .text("placeholder for Goodreads dataset analysis");
     },
   },
 ];
