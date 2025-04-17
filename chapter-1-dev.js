@@ -124,6 +124,28 @@
   let zoomedIn = false;
   let activeRectangle = null;
 
+  // Define categories globally for reuse
+  // Self-help categories (teal/internal)
+  const selfHelpCategories = [
+    "Stress Management",
+    "Underachievement & Stalled Potential",
+    "Identity, Self-Image & Belonging",
+    "Confidence & Assertiveness Issues",
+    "Life Direction & Motivation",
+  ];
+
+  // Other categories (orange/external)
+  const otherCategories = [
+    "Finding Meaning in Metaphysics",
+    "Interpersonal & Family Dynamics",
+    "Mental & Emotional Health",
+    "Spiritual & Existential Crisis",
+    "Structural & Physical Challenges",
+  ];
+
+  // All categories combined
+  const allCategories = [...selfHelpCategories, ...otherCategories];
+
   ///////////////////////////////////////////////////////////// ! Data Display Function
   // Function to display data as a grid of rectangles
   function displayData(data) {
@@ -131,12 +153,12 @@
       // Calculate how many records we can display
       const recordsToDisplay = Math.min(data.length, totalRectangles);
 
-      // Sort data by key_cat_primary_agg before displaying
-      data = data.sort((a, b) => {
-        if (!a.key_cat_primary_agg) return 1;
-        if (!b.key_cat_primary_agg) return -1;
-        return a.key_cat_primary_agg.localeCompare(b.key_cat_primary_agg);
-      });
+      // // Sort data by key_cat_primary_agg before displaying
+      // data = data.sort((a, b) => {
+      //   if (!a.key_cat_primary_agg) return 1;
+      //   if (!b.key_cat_primary_agg) return -1;
+      //   return a.key_cat_primary_agg.localeCompare(b.key_cat_primary_agg);
+      // });
 
       // Add tooltip div to body
       const tooltip = d3.select("body").append("div").attr("class", "tooltip");
@@ -327,16 +349,144 @@
         );
       zoomedIn = false;
       g.selectAll("rect").attr("fill", "var(--color-base-darker)");
-    } else if (stepId === "intro-2") {
-      // Color code rectangles based on key_cat_primary_agg
-      const selfHelpCategories = [
-        "Stress Management",
-        "Underachievement & Stalled Potential",
-        "Identity, Self-Image & Belonging",
-        "Confidence & Assertiveness Issues",
-        "Life Direction & Motivation",
-      ];
 
+      // Reset positions to grid
+      g.selectAll("rect")
+        .transition()
+        .duration(750)
+        .attr("x", function (d, i) {
+          const col = i % rectsPerRow;
+          return col * totalRectWidth + spacing;
+        })
+        .attr("y", function (d, i) {
+          const row = Math.floor(i / rectsPerRow);
+          return row * totalRectHeight + spacing;
+        });
+
+      // Remove any category labels
+      g.selectAll(".category-label").remove();
+      ///////////////////////////////////////////////////////////// ! organize by category
+    } else if (stepId === "intro-2") {
+      // Create category piles in a grid layout (5 columns, 2 rows)
+      const pilePositions = {};
+      const gridCols = 5;
+      const colWidth = chartWidth / gridCols;
+      const rowHeight = chartHeight / 3;
+
+      // Position self-help categories on top row
+      selfHelpCategories.forEach((category, i) => {
+        pilePositions[category] = {
+          x: colWidth * (i + 0.5),
+          y: rowHeight * 1,
+        };
+      });
+
+      // Position other categories on bottom row
+      otherCategories.forEach((category, i) => {
+        pilePositions[category] = {
+          x: colWidth * (i + 0.5),
+          y: rowHeight * 2,
+        };
+      });
+
+      // Add an "Uncategorized" position for any that don't match
+      pilePositions["Uncategorized"] = {
+        x: chartWidth / 2,
+        y: rowHeight * 2.5,
+      };
+
+      // Prepare nodes for positioning
+      const nodes = [];
+      g.selectAll("rect").each(function (d) {
+        if (!d) return; // Skip if no data
+
+        const rect = d3.select(this);
+        let targetCat = "Uncategorized";
+
+        // Find which category this rectangle belongs to
+        if (d.key_cat_primary_agg) {
+          if (allCategories.includes(d.key_cat_primary_agg)) {
+            targetCat = d.key_cat_primary_agg;
+          }
+        }
+
+        // Store node data
+        nodes.push({
+          category: targetCat,
+          element: this,
+          x: parseFloat(rect.attr("x")) + rectWidth / 2,
+          y: parseFloat(rect.attr("y")) + rectHeight / 2,
+        });
+      });
+
+      // Apply positions with more heavily staggered movement in batches
+      const batchSize = 100; // Increase batch size from 50 to 100
+      const totalTime = 700; // Reduce total time from 2000 to 700ms
+
+      // Process nodes in batches
+      for (
+        let batch = 0;
+        batch < Math.ceil(nodes.length / batchSize);
+        batch++
+      ) {
+        const start = batch * batchSize;
+        const end = Math.min(start + batchSize, nodes.length);
+
+        // Add a delay between batches - reduce delay between batches
+        const batchDelay = batch * 70; // Reduce from 200ms to 70ms per batch
+
+        // Process this batch
+        for (let i = start; i < end; i++) {
+          const node = nodes[i];
+          const pos = pilePositions[node.category];
+
+          // Skip any nodes with undefined positions
+          if (!pos) continue;
+
+          // Add random offset within the pile to create natural clustering
+          const offsetX = (Math.random() - 0.5) * colWidth * 0.4;
+          const offsetY = (Math.random() - 0.5) * rowHeight * 0.25;
+
+          // Calculate target position
+          const targetX = pos.x + offsetX;
+          const targetY = pos.y + offsetY;
+
+          // Apply transition with delay
+          const withinBatchDelay = Math.random() * 130; // Reduce from 400ms to 130ms
+
+          d3.select(node.element)
+            .transition()
+            .delay(batchDelay + withinBatchDelay)
+            .duration(80) // Reduce from 100ms to 80ms
+            .ease(d3.easeQuadOut) // Change to slightly faster easing
+            .attr("x", targetX - rectWidth / 2)
+            .attr("y", targetY - rectHeight / 2);
+        }
+      }
+
+      // Remove any existing category labels
+      g.selectAll(".category-label").remove();
+
+      // Add category labels for all categories
+      allCategories.forEach((category) => {
+        const pos = pilePositions[category];
+        if (!pos) return;
+
+        g.append("text")
+          .attr("class", "category-label")
+          .attr("x", pos.x)
+          .attr("y", pos.y - rowHeight * 0.25)
+          .attr("text-anchor", "middle")
+          .style("font-family", "Libre Franklin, sans-serif")
+          .style("font-weight", "200")
+          .style("font-size", "14px")
+          .style("color", "#000")
+          // .attr("fill", "white")
+          .attr("filter", "drop-shadow(1px 1px 2px var(--color-base-darker))")
+          .text(category);
+      });
+    } else if (stepId === "external-internal") {
+      // Apply color changes immediately based on category
       g.selectAll("rect").attr("fill", function (d) {
         if (
           d &&
@@ -344,21 +494,16 @@
           selfHelpCategories.includes(d.key_cat_primary_agg)
         ) {
           return "var(--color-teal)";
-        } else {
+        } else if (
+          d &&
+          d.key_cat_primary_agg &&
+          otherCategories.includes(d.key_cat_primary_agg)
+        ) {
           return "var(--color-orange)";
+        } else {
+          return "var(--color-base-darker)";
         }
       });
-
-      // Use a milder zoom compared to original
-      const centerX = chartWidth / 2;
-      const centerY = chartHeight / 2;
-      const transform = d3.zoomIdentity
-        .translate(width / 2, height / 2)
-        .scale(2)
-        .translate(-centerX, -centerY);
-
-      svg.transition().duration(1000).call(zoom.transform, transform);
-      zoomedIn = true;
     } else if (stepId === "goodreads-data") {
       // Remove our visualization when moving to the next section
       const chapter1Div = document.getElementById("chapter-1");

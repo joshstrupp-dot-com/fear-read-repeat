@@ -326,21 +326,12 @@
       .selectAll("text")
       .style("text-anchor", "middle");
 
-    // // Add x-axis label
-    // svg
-    //   .append("text")
-    //   .attr("x", width / 2)
-    //   .attr("y", height + margin.bottom - 20)
-    //   .style("text-anchor", "middle")
-    //   .text("Year (5-year bins)");
-
     // Add y-axis
     svg.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
 
     // Add y-axis label
     svg
       .append("text")
-      // .attr("class", "y-axis-label")
       .attr("class", "annotation")
       .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
@@ -437,7 +428,64 @@
         .text(key);
     });
 
-    // Add categories to legend (after the origins)
+    // Add simple buttons for toggling percentage and categories
+    // Create a button group for percentage toggle
+    const percentageButton = legend
+      .append("g")
+      .attr("transform", `translate(0, ${2 * 20 + 10})`);
+
+    // Add a clickable rectangle for the percentage button
+    percentageButton
+      .append("rect")
+      .attr("width", 100)
+      .attr("height", 20)
+      .attr("fill", "transparent")
+      .style("cursor", "pointer")
+      .on("click", function () {
+        showPercentage = !showPercentage;
+        updateChart();
+      });
+
+    // Add text label for the percentage button
+    percentageButton
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 15)
+      .text("Toggle Percentage")
+      .style("pointer-events", "none"); // Prevent text from blocking clicks
+
+    // Create a button group for categories toggle
+    const categoriesButton = legend
+      .append("g")
+      .attr("transform", `translate(0, ${3 * 20 + 10})`);
+
+    // Add a clickable rectangle for the categories button
+    categoriesButton
+      .append("rect")
+      .attr("width", 100)
+      .attr("height", 20)
+      .attr("fill", "transparent")
+      .style("cursor", "pointer")
+      .on("click", function () {
+        showCategories = !showCategories;
+        // Update legend visibility
+        d3.selectAll(".origin-legend").style("opacity", showCategories ? 0 : 1);
+        d3.selectAll(".category-legend").style(
+          "opacity",
+          showCategories ? 1 : 0
+        );
+        updateChart();
+      });
+
+    // Add text label for the categories button
+    categoriesButton
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 15)
+      .text("Toggle Categories")
+      .style("pointer-events", "none"); // Prevent text from blocking clicks
+
+    // Add categories to legend
     categories.forEach((category, i) => {
       const legendRow = legend
         .append("g")
@@ -460,20 +508,11 @@
         .attr("x", 25)
         .attr("y", 12.5)
         .attr("class", "annotation")
+        .style("pointer-events", "none") // Prevent text from blocking clicks
         .text(category);
     });
 
-    ///////////////////////////////////////////////////////////// ! Title and Controls
-    // Add title
-    // svg
-    //   .append("text")
-    //   .attr("class", "chart-title annotation")
-    //   .attr("x", width / 2)
-    //   .attr("y", -margin.top / 2)
-    //   .attr("text-anchor", "middle")
-    //   .text("Problem Origin by Year"); // Default title
-
-    // Add button click handler
+    // Add button click handler for expanding chart
     d3.select("#expand-chart").on("click", function () {
       if (currentVisibleCount < years.length) {
         currentVisibleCount++;

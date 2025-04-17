@@ -131,7 +131,7 @@ const stepsConfig = [
   },
   {
     id: "external-internal",
-    text: "As we explore trends across time, we'll explore the progression of self help books through two categories — EXTERNAL, books that explore struggles that originate outside of the self (society, politics, family, metaphysics); and INTERNAL,or books that explore anxieties stemming from within the self (self-esteem, willpower, internalized doubt).",
+    text: 'As we explore trends across time, we\'ll explore the progression of self help books through two categories — <span style="color: var(--color-teal);">external</span>, books that explore struggles that originate outside of the self (society, politics, family, metaphysics); and <span style="color: var(--color-orange);">internal</span>,or books that explore anxieties stemming from within the self (self-esteem, willpower, internalized doubt).',
     fullwidth: true,
     render: () => {
       // Empty placeholder for this step
@@ -227,7 +227,8 @@ const stepsConfig = [
   },
   {
     id: "post-ww2",
-    text: "Despite selling millions, these prototypical ‘internal’ books were no match for those ‘external’ books that, once again, reflected the powerlessness that comes from genocide and nuclear doom. We look to God. We find meaning in our relationships. We don’t focus on ourselves, we focus on our community and our country.",
+    text: "Despite selling millions, these prototypical <span style='color: var(--color-teal);'>internal</span> books were no match for those <span style='color: var(--color-orange);'>external</span> books that, once again, reflected the powerlessness that comes from genocide and nuclear doom. <br><br>We look to God. We find meaning in our relationships. We don't focus on ourselves, we focus on our community and our country.",
+
     fullwidth: true,
     render: () => {
       // Just update the existing visualization
