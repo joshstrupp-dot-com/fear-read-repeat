@@ -1,5 +1,42 @@
 // Chapter 1 - Simple Data Visualization
 (function () {
+  ///////////////////////////////////////////////////////////// ! Data Preloading
+  // Global data cache
+  window.dataCache = window.dataCache || {};
+
+  // Preload all needed datasets at the start
+  function preloadAllData() {
+    // Preload time data
+    if (!window.dataCache.timeData) {
+      console.log("Preloading time data");
+      d3.csv("data/sh_0415_time/sh_0415_time.csv")
+        .then(function (data) {
+          window.dataCache.timeData = data;
+          console.log("Time data preloaded:", data.length, "records");
+        })
+        .catch(function (error) {
+          console.error("Error preloading time data:", error);
+        });
+    }
+
+    // Preload author data
+    if (!window.dataCache.authorData) {
+      console.log("Preloading author data");
+      d3.csv("data/sh_0415_author/author.csv")
+        .then(function (data) {
+          window.dataCache.authorData = data;
+          console.log("Author data preloaded:", data.length, "records");
+        })
+        .catch(function (error) {
+          console.error("Error preloading author data:", error);
+        });
+    }
+  }
+
+  // Start preloading all data immediately
+  preloadAllData();
+
+  ///////////////////////////////////////////////////////////// ! Setup and Configuration
   // First, adjust the chapter-1 div to fill the viewport
   const chapter1Div = document.getElementById("chapter-1");
   chapter1Div.style.width = "100vw";
@@ -19,6 +56,7 @@
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
+  ///////////////////////////////////////////////////////////// ! Rectangle Calculations
   // Target number of rectangles (approximate)
   const targetCount = 45000; // Adjust this number based on desired density
   const spacing = 1;
@@ -52,6 +90,7 @@
     `Rectangles per row: ${rectsPerRow}, Rectangles per column: ${rectsPerColumn}`
   );
 
+  ///////////////////////////////////////////////////////////// ! Create SVG
   // Create SVG container with 100% dimensions
   const svg = d3
     .select("#chapter-1")
@@ -65,6 +104,7 @@
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+  ///////////////////////////////////////////////////////////// ! Zoom Behavior
   // Create zoom behavior
   const zoom = d3
     .zoom()
@@ -84,11 +124,19 @@
   let zoomedIn = false;
   let activeRectangle = null;
 
+  ///////////////////////////////////////////////////////////// ! Data Display Function
   // Function to display data as a grid of rectangles
   function displayData(data) {
     if (data && data.length > 0) {
       // Calculate how many records we can display
       const recordsToDisplay = Math.min(data.length, totalRectangles);
+
+      // Sort data by key_cat_primary_agg before displaying
+      data = data.sort((a, b) => {
+        if (!a.key_cat_primary_agg) return 1;
+        if (!b.key_cat_primary_agg) return -1;
+        return a.key_cat_primary_agg.localeCompare(b.key_cat_primary_agg);
+      });
 
       // Add tooltip div to body
       const tooltip = d3.select("body").append("div").attr("class", "tooltip");
@@ -106,14 +154,20 @@
           .attr("y", y)
           .attr("width", rectWidth)
           .attr("height", rectHeight)
-          .attr("fill", "var(--color-purple)")
+          .attr("fill", "var(--color-base-darker)")
           .attr("stroke", "none")
           .attr("rx", 1) // Add 1px rounded corner
           .datum(data[i])
           .on("mouseover", function (event, d) {
-            // Show tooltip with name
+            // Show tooltip with name and category
             tooltip
-              .html(d.name || "Unnamed Record")
+              .html(
+                `${d.name || "Unnamed Record"}${
+                  d.key_cat_primary_agg
+                    ? "<br>Category: " + d.key_cat_primary_agg
+                    : ""
+                }`
+              )
               .style("left", event.pageX + 10 + "px")
               .style("top", event.pageY - 28 + "px")
               .style("opacity", 0.9);
@@ -129,7 +183,7 @@
               // Store the clicked rectangle as active
               activeRectangle = this;
               // Only highlight the active rectangle
-              g.selectAll("rect").attr("fill", "var(--color-base-darker)");
+              // g.selectAll("rect").attr("fill", "var(--color-base-darker)");
               d3.select(this).attr("fill", "var(--color-purple)");
 
               // Calculate zoom level - we want to show approximately 5-7 books around the clicked one
@@ -164,7 +218,7 @@
               zoomedIn = false;
 
               // Reset all rectangle colors
-              g.selectAll("rect").attr("fill", "var(--color-base-darker)");
+              // g.selectAll("rect").attr("fill", "var(--color-base-darker)");
             }
           });
       }
@@ -199,38 +253,52 @@
           zoomedIn = false;
 
           // Reset all rectangle colors
-          g.selectAll("rect").attr("fill", "var(--color-purple)");
+          // g.selectAll("rect").attr("fill", "var(--color-base-darker)");
         }
       });
     }
   }
 
+  ///////////////////////////////////////////////////////////// ! Data Loading
   // Try loading data
-  try {
-    d3.csv("data/sh_0415_time/sh_0415_time.csv")
-      .then(displayData)
-      .catch(() => {
-        // Alternative fetch method if d3.csv fails
-        fetch("data/sh_0415_time/sh_0415_time.csv")
-          .then((response) => response.text())
-          .then((csvText) => {
-            const rows = csvText.split("\n");
-            const headers = rows[0].split(",");
-            const parsedData = rows.slice(1).map((row) => {
-              const values = row.split(",");
-              const obj = {};
-              headers.forEach((header, i) => {
-                obj[header] = values[i];
+  function loadData() {
+    // First, check if data is already preloaded in dataCache
+    if (window.dataCache && window.dataCache.timeData) {
+      console.log("Using preloaded time data");
+      displayData(window.dataCache.timeData);
+      return;
+    }
+
+    // Otherwise, fall back to loading data directly
+    try {
+      d3.csv("data/sh_0415_time/sh_0415_time.csv")
+        .then(displayData)
+        .catch(() => {
+          // Alternative fetch method if d3.csv fails
+          fetch("data/sh_0415_time/sh_0415_time.csv")
+            .then((response) => response.text())
+            .then((csvText) => {
+              const rows = csvText.split("\n");
+              const headers = rows[0].split(",");
+              const parsedData = rows.slice(1).map((row) => {
+                const values = row.split(",");
+                const obj = {};
+                headers.forEach((header, i) => {
+                  obj[header] = values[i];
+                });
+                return obj;
               });
-              return obj;
-            });
-            displayData(parsedData);
-          })
-          .catch(useHardcodedData);
-      });
-  } catch (error) {
-    useHardcodedData();
+              displayData(parsedData);
+            })
+            .catch(useHardcodedData);
+        });
+    } catch (error) {
+      useHardcodedData();
+    }
   }
+
+  // Load data when visualization is ready
+  loadData();
 
   // Function to generate hard-coded data if CSV loading fails
   function useHardcodedData() {
@@ -242,7 +310,8 @@
     }));
     displayData(fakeData);
   }
-  // Near the end of chapter-1-dev.js
+
+  ///////////////////////////////////////////////////////////// ! Event Handling
   document.addEventListener("visualizationUpdate", (event) => {
     const stepId = event.detail.step;
 
@@ -259,14 +328,33 @@
       zoomedIn = false;
       g.selectAll("rect").attr("fill", "var(--color-base-darker)");
     } else if (stepId === "intro-2") {
-      // Zoom in to a specific area
-      const centerX = chartWidth / 3;
-      const centerY = chartHeight / 3;
+      // Color code rectangles based on key_cat_primary_agg
+      const selfHelpCategories = [
+        "Stress Management",
+        "Underachievement & Stalled Potential",
+        "Identity, Self-Image & Belonging",
+        "Confidence & Assertiveness Issues",
+        "Life Direction & Motivation",
+      ];
 
-      // Transition to a zoomed view
+      g.selectAll("rect").attr("fill", function (d) {
+        if (
+          d &&
+          d.key_cat_primary_agg &&
+          selfHelpCategories.includes(d.key_cat_primary_agg)
+        ) {
+          return "var(--color-teal)";
+        } else {
+          return "var(--color-orange)";
+        }
+      });
+
+      // Use a milder zoom compared to original
+      const centerX = chartWidth / 2;
+      const centerY = chartHeight / 2;
       const transform = d3.zoomIdentity
         .translate(width / 2, height / 2)
-        .scale(3)
+        .scale(2)
         .translate(-centerX, -centerY);
 
       svg.transition().duration(1000).call(zoom.transform, transform);

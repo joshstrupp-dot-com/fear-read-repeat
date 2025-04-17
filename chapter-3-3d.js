@@ -102,27 +102,34 @@
   }
 
   try {
-    // Try loading data
-    d3.csv("data/sh_0415_author/author.csv")
-      .then(displayAuthorData3D)
-      .catch(() => {
-        fetch("data/sh_0415_author/author.csv")
-          .then((response) => response.text())
-          .then((csvText) => {
-            const rows = csvText.split("\n");
-            const headers = rows[0].split(",");
-            const parsedData = rows.slice(1).map((row) => {
-              const values = row.split(",");
-              const obj = {};
-              headers.forEach((header, i) => {
-                obj[header] = values[i];
+    // First check if data is already preloaded in dataCache
+    if (window.dataCache && window.dataCache.authorData) {
+      console.log("Using preloaded author data for 3D visualization");
+      displayAuthorData3D(window.dataCache.authorData);
+    } else {
+      // Try loading data directly if not preloaded
+      d3.csv("data/sh_0415_author/author.csv")
+        .then(displayAuthorData3D)
+        .catch(() => {
+          // Rest of your existing fetch fallback code
+          fetch("data/sh_0415_author/author.csv")
+            .then((response) => response.text())
+            .then((csvText) => {
+              const rows = csvText.split("\n");
+              const headers = rows[0].split(",");
+              const parsedData = rows.slice(1).map((row) => {
+                const values = row.split(",");
+                const obj = {};
+                headers.forEach((header, i) => {
+                  obj[header] = values[i];
+                });
+                return obj;
               });
-              return obj;
-            });
-            displayAuthorData3D(parsedData);
-          })
-          .catch(useHardcodedData);
-      });
+              displayAuthorData3D(parsedData);
+            })
+            .catch(useHardcodedData);
+        });
+    }
   } catch (error) {
     useHardcodedData();
   }

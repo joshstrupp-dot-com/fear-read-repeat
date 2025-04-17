@@ -191,18 +191,30 @@
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Try loading data
-    d3.csv("data/sh_0415_author/author.csv")
-      .then((data) => {
-        allAuthorData = data; // Store the loaded data
+    // Check if data is already preloaded in dataCache
+    if (window.dataCache && window.dataCache.authorData) {
+      console.log("Using preloaded author data");
+      allAuthorData = window.dataCache.authorData;
 
-        // Get initial step from URL if available
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentStep = urlParams.get("step") || "all-authors";
+      // Get initial step from URL if available
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentStep = urlParams.get("step") || "all-authors";
 
-        displayAuthorData(filterDataForStep(currentStep));
-      })
-      .catch(stepFilter);
+      displayAuthorData(filterDataForStep(currentStep));
+    } else {
+      // Try loading data directly if not preloaded
+      d3.csv("data/sh_0415_author/author.csv")
+        .then((data) => {
+          allAuthorData = data; // Store the loaded data
+
+          // Get initial step from URL if available
+          const urlParams = new URLSearchParams(window.location.search);
+          const currentStep = urlParams.get("step") || "all-authors";
+
+          displayAuthorData(filterDataForStep(currentStep));
+        })
+        .catch(stepFilter);
+    }
   } catch (error) {
     stepFilter();
   }

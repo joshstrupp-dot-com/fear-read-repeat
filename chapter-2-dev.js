@@ -198,284 +198,297 @@
 
   ///////////////////////////////////////////////////////////// ! Data Loading and Processing
   // Load the CSV file and create a line chart
-  d3.csv("data/sh_0415_time/sh_0415_time.csv")
-    .then((data) => {
-      // Filter out specific year bins
-      const filteredData = data.filter(
-        (d) =>
-          d.year_bin_5yr !== "0_0_pre-1855" &&
-          d.year_bin_5yr !== "0_pre-1855" &&
-          d.year_bin_5yr !== "9_post-2014"
-      );
+  function loadVisualizationData() {
+    // First check if data is already preloaded in dataCache
+    if (window.dataCache && window.dataCache.timeData) {
+      console.log("Using preloaded time data in chapter-2");
+      createVisualization(window.dataCache.timeData);
+      return;
+    }
 
-      ///////////////////////////////////////////////////////////// ! Data Aggregation
-      // Group data by year_bin_5yr and problem_origin, and count records
-      const groupedData = d3.rollup(
-        filteredData,
-        (v) => ({
-          count: v.length,
-          names: v.map((d) => d.name),
-        }),
-        (d) => d.year_bin_5yr,
-        (d) => d.problem_origin
-      );
+    // Otherwise, load data directly
+    d3.csv("data/sh_0415_time/sh_0415_time.csv")
+      .then(createVisualization)
+      .catch((error) => console.error("Error loading CSV:", error));
+  }
 
-      // Group data by year_bin_5yr and key_cat_primary_agg
-      const groupedCategoryData = d3.rollup(
-        filteredData,
-        (v) => ({
-          count: v.length,
-          names: v.map((d) => d.name),
-        }),
-        (d) => d.year_bin_5yr,
-        (d) => d.key_cat_primary_agg
-      );
+  // Start loading data immediately
+  loadVisualizationData();
 
-      // Get all unique categories
-      categories = [
-        ...new Set(filteredData.map((d) => d.key_cat_primary_agg)),
-      ].filter(Boolean);
+  function createVisualization(data) {
+    // Filter out specific year bins
+    const filteredData = data.filter(
+      (d) =>
+        d.year_bin_5yr !== "0_0_pre-1855" &&
+        d.year_bin_5yr !== "0_pre-1855" &&
+        d.year_bin_5yr !== "9_post-2014"
+    );
 
-      ///////////////////////////////////////////////////////////// ! Data Transformation
-      // Convert the nested Map to an array format suitable for lines
-      years = Array.from(groupedData.keys()).sort();
-      chartData = years.map((year) => {
-        const yearData = { year: year };
-        const origins = groupedData.get(year);
-        // Add counts and names for each problem origin
-        yearData.INTERNAL = origins.get("INTERNAL")?.count || 0;
-        yearData.INTERNAL_names = origins.get("INTERNAL")?.names || [];
-        yearData.EXTERNAL = origins.get("EXTERNAL")?.count || 0;
-        yearData.EXTERNAL_names = origins.get("EXTERNAL")?.names || [];
-        return yearData;
-      });
+    ///////////////////////////////////////////////////////////// ! Data Aggregation
+    // Group data by year_bin_5yr and problem_origin, and count records
+    const groupedData = d3.rollup(
+      filteredData,
+      (v) => ({
+        count: v.length,
+        names: v.map((d) => d.name),
+      }),
+      (d) => d.year_bin_5yr,
+      (d) => d.problem_origin
+    );
 
-      // Create flattened category data for easier plotting
-      categoryData = [];
-      years.forEach((year) => {
-        const yearCats = groupedCategoryData.get(year);
-        if (yearCats) {
-          categories.forEach((category) => {
-            const catData = yearCats.get(category);
-            if (catData) {
-              categoryData.push({
-                year,
-                category,
-                value: catData.count,
-                names: catData.names,
-              });
-            } else {
-              categoryData.push({
-                year,
-                category,
-                value: 0,
-                names: [],
-              });
-            }
-          });
-        }
-      });
+    // Group data by year_bin_5yr and key_cat_primary_agg
+    const groupedCategoryData = d3.rollup(
+      filteredData,
+      (v) => ({
+        count: v.length,
+        names: v.map((d) => d.name),
+      }),
+      (d) => d.year_bin_5yr,
+      (d) => d.key_cat_primary_agg
+    );
 
-      // Get first 6 years for initial view
-      const visibleYears = years.slice(0, currentVisibleCount);
+    // Get all unique categories
+    categories = [
+      ...new Set(filteredData.map((d) => d.key_cat_primary_agg)),
+    ].filter(Boolean);
 
-      // Get max count only from visible years' data based on what's shown by default
-      const visibleData = chartData.filter((d) =>
-        visibleYears.includes(d.year)
-      );
-      const visibleMax = d3.max(visibleData, (d) =>
-        Math.max(d.INTERNAL, d.EXTERNAL)
-      );
+    ///////////////////////////////////////////////////////////// ! Data Transformation
+    // Convert the nested Map to an array format suitable for lines
+    years = Array.from(groupedData.keys()).sort();
+    chartData = years.map((year) => {
+      const yearData = { year: year };
+      const origins = groupedData.get(year);
+      // Add counts and names for each problem origin
+      yearData.INTERNAL = origins.get("INTERNAL")?.count || 0;
+      yearData.INTERNAL_names = origins.get("INTERNAL")?.names || [];
+      yearData.EXTERNAL = origins.get("EXTERNAL")?.count || 0;
+      yearData.EXTERNAL_names = origins.get("EXTERNAL")?.names || [];
+      return yearData;
+    });
 
-      ///////////////////////////////////////////////////////////// ! Create SVG
-      svg = d3
-        .select("#chapter-2")
-        .append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .style("display", "block")
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+    // Create flattened category data for easier plotting
+    categoryData = [];
+    years.forEach((year) => {
+      const yearCats = groupedCategoryData.get(year);
+      if (yearCats) {
+        categories.forEach((category) => {
+          const catData = yearCats.get(category);
+          if (catData) {
+            categoryData.push({
+              year,
+              category,
+              value: catData.count,
+              names: catData.names,
+            });
+          } else {
+            categoryData.push({
+              year,
+              category,
+              value: 0,
+              names: [],
+            });
+          }
+        });
+      }
+    });
 
-      ///////////////////////////////////////////////////////////// ! Scales Definition
-      // Set up scales
-      x = d3.scaleBand().domain(visibleYears).range([0, width]).padding(0.2);
-      y = d3.scaleLinear().domain([0, visibleMax]).range([height, 0]);
+    // Get first 6 years for initial view
+    const visibleYears = years.slice(0, currentVisibleCount);
 
-      ///////////////////////////////////////////////////////////// ! Axes Creation
-      // Add x-axis
+    // Get max count only from visible years' data based on what's shown by default
+    const visibleData = chartData.filter((d) => visibleYears.includes(d.year));
+    const visibleMax = d3.max(visibleData, (d) =>
+      Math.max(d.INTERNAL, d.EXTERNAL)
+    );
+
+    ///////////////////////////////////////////////////////////// ! Create SVG
+    svg = d3
+      .select("#chapter-2")
+      .append("svg")
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .style("display", "block")
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    ///////////////////////////////////////////////////////////// ! Scales Definition
+    // Set up scales
+    x = d3.scaleBand().domain(visibleYears).range([0, width]).padding(0.2);
+    y = d3.scaleLinear().domain([0, visibleMax]).range([height, 0]);
+
+    ///////////////////////////////////////////////////////////// ! Axes Creation
+    // Add x-axis
+    svg
+      .append("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .style("text-anchor", "middle");
+
+    // // Add x-axis label
+    // svg
+    //   .append("text")
+    //   .attr("x", width / 2)
+    //   .attr("y", height + margin.bottom - 20)
+    //   .style("text-anchor", "middle")
+    //   .text("Year (5-year bins)");
+
+    // Add y-axis
+    svg.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
+
+    // Add y-axis label
+    svg
+      .append("text")
+      // .attr("class", "y-axis-label")
+      .attr("class", "annotation")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -height / 2)
+      .attr("y", -margin.left + 50)
+      .style("text-anchor", "middle")
+      .text("Number of Books");
+
+    ///////////////////////////////////////////////////////////// ! Color Scales
+    // Color scale for origin
+    const originColors = ["var(--color-teal)", "var(--color-orange)"];
+
+    // Extended color scale for categories
+    color = d3
+      .scaleOrdinal()
+      .domain([...["INTERNAL", "EXTERNAL"], ...categories])
+      .range([...originColors, ...d3.schemeCategory10]);
+
+    ///////////////////////////////////////////////////////////// ! Line Creation
+    // Create the lines
+    const line = d3
+      .line()
+      .x((d) => x(d.year) + x.bandwidth() / 2)
+      .y((d) => y(d.value));
+
+    // Add lines for each problem origin
+    ["INTERNAL", "EXTERNAL"].forEach((origin) => {
+      // Filter data to only visible years for initial render
+      const visibleLineData = chartData
+        .filter((d) => visibleYears.includes(d.year))
+        .map((d) => ({
+          year: d.year,
+          value: d[origin],
+          names: d[`${origin}_names`],
+        }));
+
+      // Add the actual data line
       svg
-        .append("g")
-        .attr("class", "x-axis")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-        .style("text-anchor", "middle");
+        .append("path")
+        .attr("class", `line-${origin}`)
+        .datum(visibleLineData)
+        .attr("fill", "none")
+        .attr("stroke", color(origin))
+        .attr("stroke-width", 2)
+        .attr("d", line)
+        .style("opacity", 1); // Visible by default
+    });
 
-      // // Add x-axis label
-      // svg
-      //   .append("text")
-      //   .attr("x", width / 2)
-      //   .attr("y", height + margin.bottom - 20)
-      //   .style("text-anchor", "middle")
-      //   .text("Year (5-year bins)");
+    // Add lines for each category
+    categories.forEach((category) => {
+      // Get data for this category
+      const categoryVisibleData = categoryData.filter(
+        (d) => d.category === category && visibleYears.includes(d.year)
+      );
 
-      // Add y-axis
-      svg.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
+      const safeSelector = makeSafeSelector(category);
 
-      // Add y-axis label
+      // Add the line
       svg
+        .append("path")
+        .attr("class", `line-${safeSelector}`)
+        .datum(categoryVisibleData)
+        .attr("fill", "none")
+        .attr("stroke", color(category))
+        .attr("stroke-width", 1.5)
+        .attr("stroke-dasharray", "3,3")
+        .attr("d", line)
+        .style("opacity", 0); // Hidden by default
+    });
+
+    ///////////////////////////////////////////////////////////// ! Legend Creation
+    // Add legend
+    const legend = svg
+      .append("g")
+      .attr("transform", `translate(${width - 150}, 0)`);
+
+    // Add origins to legend
+    ["INTERNAL", "EXTERNAL"].forEach((key, i) => {
+      const legendRow = legend
+        .append("g")
+        .attr("class", "origin-legend")
+        .attr("transform", `translate(0, ${i * 20})`);
+
+      legendRow
+        .append("rect")
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", color(key));
+
+      legendRow
         .append("text")
-        // .attr("class", "y-axis-label")
+        .attr("x", 25)
+        .attr("y", 12.5)
         .attr("class", "annotation")
-        .attr("transform", "rotate(-90)")
-        .attr("x", -height / 2)
-        .attr("y", -margin.left + 50)
-        .style("text-anchor", "middle")
-        .text("Number of Books");
+        .text(key);
+    });
 
-      ///////////////////////////////////////////////////////////// ! Color Scales
-      // Color scale for origin
-      const originColors = ["var(--color-teal)", "var(--color-orange)"];
-
-      // Extended color scale for categories
-      color = d3
-        .scaleOrdinal()
-        .domain([...["INTERNAL", "EXTERNAL"], ...categories])
-        .range([...originColors, ...d3.schemeCategory10]);
-
-      ///////////////////////////////////////////////////////////// ! Line Creation
-      // Create the lines
-      const line = d3
-        .line()
-        .x((d) => x(d.year) + x.bandwidth() / 2)
-        .y((d) => y(d.value));
-
-      // Add lines for each problem origin
-      ["INTERNAL", "EXTERNAL"].forEach((origin) => {
-        // Filter data to only visible years for initial render
-        const visibleLineData = chartData
-          .filter((d) => visibleYears.includes(d.year))
-          .map((d) => ({
-            year: d.year,
-            value: d[origin],
-            names: d[`${origin}_names`],
-          }));
-
-        // Add the actual data line
-        svg
-          .append("path")
-          .attr("class", `line-${origin}`)
-          .datum(visibleLineData)
-          .attr("fill", "none")
-          .attr("stroke", color(origin))
-          .attr("stroke-width", 2)
-          .attr("d", line)
-          .style("opacity", 1); // Visible by default
-      });
-
-      // Add lines for each category
-      categories.forEach((category) => {
-        // Get data for this category
-        const categoryVisibleData = categoryData.filter(
-          (d) => d.category === category && visibleYears.includes(d.year)
-        );
-
-        const safeSelector = makeSafeSelector(category);
-
-        // Add the line
-        svg
-          .append("path")
-          .attr("class", `line-${safeSelector}`)
-          .datum(categoryVisibleData)
-          .attr("fill", "none")
-          .attr("stroke", color(category))
-          .attr("stroke-width", 1.5)
-          .attr("stroke-dasharray", "3,3")
-          .attr("d", line)
-          .style("opacity", 0); // Hidden by default
-      });
-
-      ///////////////////////////////////////////////////////////// ! Legend Creation
-      // Add legend
-      const legend = svg
+    // Add categories to legend (after the origins)
+    categories.forEach((category, i) => {
+      const legendRow = legend
         .append("g")
-        .attr("transform", `translate(${width - 150}, 0)`);
+        .attr("class", "category-legend")
+        .attr("transform", `translate(0, ${i * 20})`)
+        .style("opacity", 0); // Hidden by default
 
-      // Add origins to legend
-      ["INTERNAL", "EXTERNAL"].forEach((key, i) => {
-        const legendRow = legend
-          .append("g")
-          .attr("class", "origin-legend")
-          .attr("transform", `translate(0, ${i * 20})`);
+      legendRow
+        .append("line")
+        .attr("x1", 0)
+        .attr("y1", 7.5)
+        .attr("x2", 15)
+        .attr("y2", 7.5)
+        .attr("stroke", color(category))
+        .attr("stroke-width", 1.5)
+        .attr("stroke-dasharray", "3,3");
 
-        legendRow
-          .append("rect")
-          .attr("width", 15)
-          .attr("height", 15)
-          .attr("fill", color(key));
+      legendRow
+        .append("text")
+        .attr("x", 25)
+        .attr("y", 12.5)
+        .attr("class", "annotation")
+        .text(category);
+    });
 
-        legendRow
-          .append("text")
-          .attr("x", 25)
-          .attr("y", 12.5)
-          .attr("class", "annotation")
-          .text(key);
-      });
+    ///////////////////////////////////////////////////////////// ! Title and Controls
+    // Add title
+    // svg
+    //   .append("text")
+    //   .attr("class", "chart-title annotation")
+    //   .attr("x", width / 2)
+    //   .attr("y", -margin.top / 2)
+    //   .attr("text-anchor", "middle")
+    //   .text("Problem Origin by Year"); // Default title
 
-      // Add categories to legend (after the origins)
-      categories.forEach((category, i) => {
-        const legendRow = legend
-          .append("g")
-          .attr("class", "category-legend")
-          .attr("transform", `translate(0, ${i * 20})`)
-          .style("opacity", 0); // Hidden by default
+    // Add button click handler
+    d3.select("#expand-chart").on("click", function () {
+      if (currentVisibleCount < years.length) {
+        currentVisibleCount++;
+        updateChart();
+      }
+    });
 
-        legendRow
-          .append("line")
-          .attr("x1", 0)
-          .attr("y1", 7.5)
-          .attr("x2", 15)
-          .attr("y2", 7.5)
-          .attr("stroke", color(category))
-          .attr("stroke-width", 1.5)
-          .attr("stroke-dasharray", "3,3");
+    // Set checkboxes to unchecked by default
+    d3.select("#toggle-categories").property("checked", false);
+    d3.select("#toggle-percentage").property("checked", false);
 
-        legendRow
-          .append("text")
-          .attr("x", 25)
-          .attr("y", 12.5)
-          .attr("class", "annotation")
-          .text(category);
-      });
-
-      ///////////////////////////////////////////////////////////// ! Title and Controls
-      // Add title
-      // svg
-      //   .append("text")
-      //   .attr("class", "chart-title annotation")
-      //   .attr("x", width / 2)
-      //   .attr("y", -margin.top / 2)
-      //   .attr("text-anchor", "middle")
-      //   .text("Problem Origin by Year"); // Default title
-
-      // Add button click handler
-      d3.select("#expand-chart").on("click", function () {
-        if (currentVisibleCount < years.length) {
-          currentVisibleCount++;
-          updateChart();
-        }
-      });
-
-      // Set checkboxes to unchecked by default
-      d3.select("#toggle-categories").property("checked", false);
-      d3.select("#toggle-percentage").property("checked", false);
-
-      // Add toggle handlers
-      d3.select("#toggle-categories").on("change", toggleCategories);
-      d3.select("#toggle-percentage").on("change", togglePercentage);
-    })
-    .catch((error) => console.error("Error loading CSV:", error));
+    // Add toggle handlers
+    d3.select("#toggle-categories").on("change", toggleCategories);
+    d3.select("#toggle-percentage").on("change", togglePercentage);
+  }
 
   // Near the end of chapter-2-dev.js
   document.addEventListener("visualizationUpdate", (event) => {
