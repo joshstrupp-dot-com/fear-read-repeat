@@ -20,6 +20,14 @@
         d.bt_count = +d.bt_count;
       });
 
+      // Calculate opacity based on avg_star_rating (Y axis)
+      const minRating = d3.min(data, (d) => d.avg_star_rating);
+      const maxRating = d3.max(data, (d) => d.avg_star_rating);
+      const opacityScale = d3
+        .scaleLinear()
+        .domain([minRating, maxRating])
+        .range([0.3, 1]);
+
       // Prepare data for Plotly
       const plotData = [
         {
@@ -36,34 +44,48 @@
             "Cred Score: %{z}<br>",
           marker: {
             size: 8,
-            color: data.map((d) => d.avg_cred_score),
-            colorscale: "Viridis",
+            color: data.map(() => "#e1d6c2"), // --color-base-darker
+            opacity: data.map((d) => opacityScale(d.avg_star_rating)),
             line: {
               color: data.map((d) =>
-                d.bt_count > 0 ? "black" : "rgba(0,0,0,0)"
+                d.bt_count > 0 ? "var(--color-teal)" : "rgba(0,0,0,0)"
               ),
               width: 2,
             },
-            opacity: 0.8,
           },
         },
       ];
 
       const layout = {
-        title: "Author Data Visualization",
         autosize: true,
         height: chapter3_3dDiv.clientHeight,
         width: chapter3_3dDiv.clientWidth,
+        paper_bgcolor: "#f2efe9", // Set background color
+        plot_bgcolor: "#f2efe9",
         scene: {
-          xaxis: { title: "Number of Books", type: "log" },
-          yaxis: { title: "Avg Star Rating" },
-          zaxis: { title: "Avg Cred Score" },
+          xaxis: {
+            title: "Number of Books",
+            type: "log",
+            titlefont: { family: "Andale Mono", size: 15, color: "#000" },
+            tickfont: { family: "Andale Mono", size: 15, color: "#000" },
+          },
+          yaxis: {
+            title: "Avg Star Rating",
+            titlefont: { family: "Andale Mono", size: 15, color: "#000" },
+            tickfont: { family: "Andale Mono", size: 15, color: "#000" },
+          },
+          zaxis: {
+            title: "Avg Cred Score",
+            titlefont: { family: "Andale Mono", size: 15, color: "#000" },
+            tickfont: { family: "Andale Mono", size: 15, color: "#000" },
+          },
+          bgcolor: "#f2efe9",
         },
         margin: {
           l: 0,
           r: 0,
           b: 0,
-          t: 50,
+          t: 0,
         },
       };
 
@@ -77,49 +99,6 @@
 
       Plotly.newPlot("chapter-3-3d", plotData, layout);
     }
-  }
-
-  // Function to use hardcoded data as fallback
-  function useHardcodedData() {
-    const hardcodedData = [
-      {
-        author_clean: "S. Truett Cathy",
-        avg_star_rating: 4.2,
-        author_num_books: 5,
-        avg_cred_score: 3.8,
-        bt_count: 1,
-      },
-      {
-        author_clean: "Michael Lewis",
-        avg_star_rating: 4.5,
-        author_num_books: 12,
-        avg_cred_score: 4.2,
-        bt_count: 0,
-      },
-      {
-        author_clean: "Daniel Kahneman",
-        avg_star_rating: 4.7,
-        author_num_books: 3,
-        avg_cred_score: 4.9,
-        bt_count: 2,
-      },
-      {
-        author_clean: "Malcolm Gladwell",
-        avg_star_rating: 4.3,
-        author_num_books: 7,
-        avg_cred_score: 3.5,
-        bt_count: 1,
-      },
-      {
-        author_clean: "Jim Collins",
-        avg_star_rating: 4.6,
-        author_num_books: 6,
-        avg_cred_score: 4.7,
-        bt_count: 2,
-      },
-    ];
-
-    displayAuthorData3D(hardcodedData);
   }
 
   try {

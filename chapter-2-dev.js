@@ -4,7 +4,7 @@
   // Adjust chapter-2 div to fill the viewport
   const chapter2Div = document.getElementById("chapter-2");
   chapter2Div.style.width = "100vw";
-  chapter2Div.style.height = "90vh";
+  chapter2Div.style.height = "100vh";
   chapter2Div.style.margin = "0";
   chapter2Div.style.padding = "0";
   chapter2Div.style.border = "none";
@@ -16,7 +16,7 @@
   const fullHeight = chapter2Div.clientHeight;
 
   // Set up margins for the chart
-  const margin = { top: 40, right: 30, bottom: 60, left: 60 };
+  const margin = { top: 100, right: 100, bottom: 100, left: 100 };
   const width = fullWidth - margin.left - margin.right;
   const height = fullHeight - margin.top - margin.bottom;
 
@@ -70,12 +70,13 @@
 
     // Update x-axis with transition
     svg
+      .attr("class", "annotation")
       .select(".x-axis")
       .transition()
       .duration(500)
       .call(d3.axisBottom(x))
-      .selectAll("text")
-      .style("text-anchor", "middle");
+      .selectAll("text");
+    // .style("text-anchor", "middle");
 
     // Update y-axis with transition
     svg.select(".y-axis").transition().duration(500).call(d3.axisLeft(y));
@@ -83,6 +84,7 @@
     // Update y-axis label
     svg
       .select(".y-axis-label")
+      .attr("class", "annotation")
       .text(showPercentage ? "Percentage (%)" : "Count");
 
     // Line generator function
@@ -310,13 +312,13 @@
         .selectAll("text")
         .style("text-anchor", "middle");
 
-      // Add x-axis label
-      svg
-        .append("text")
-        .attr("x", width / 2)
-        .attr("y", height + margin.bottom - 10)
-        .style("text-anchor", "middle")
-        .text("Year (5-year bins)");
+      // // Add x-axis label
+      // svg
+      //   .append("text")
+      //   .attr("x", width / 2)
+      //   .attr("y", height + margin.bottom - 20)
+      //   .style("text-anchor", "middle")
+      //   .text("Year (5-year bins)");
 
       // Add y-axis
       svg.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
@@ -324,16 +326,17 @@
       // Add y-axis label
       svg
         .append("text")
-        .attr("class", "y-axis-label")
+        // .attr("class", "y-axis-label")
+        .attr("class", "annotation")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
-        .attr("y", -margin.left + 15)
+        .attr("y", -margin.left + 50)
         .style("text-anchor", "middle")
-        .text("Count");
+        .text("Number of Books");
 
       ///////////////////////////////////////////////////////////// ! Color Scales
       // Color scale for origin
-      const originColors = ["#4682b4", "#ff7f50"];
+      const originColors = ["var(--color-teal)", "var(--color-orange)"];
 
       // Extended color scale for categories
       color = d3
@@ -412,7 +415,12 @@
           .attr("height", 15)
           .attr("fill", color(key));
 
-        legendRow.append("text").attr("x", 25).attr("y", 12.5).text(key);
+        legendRow
+          .append("text")
+          .attr("x", 25)
+          .attr("y", 12.5)
+          .attr("class", "annotation")
+          .text(key);
       });
 
       // Add categories to legend (after the origins)
@@ -437,20 +445,19 @@
           .append("text")
           .attr("x", 25)
           .attr("y", 12.5)
-          .text(category)
-          .style("font-size", "10px");
+          .attr("class", "annotation")
+          .text(category);
       });
 
       ///////////////////////////////////////////////////////////// ! Title and Controls
       // Add title
-      svg
-        .append("text")
-        .attr("class", "chart-title")
-        .attr("x", width / 2)
-        .attr("y", -margin.top / 2)
-        .attr("text-anchor", "middle")
-        .style("font-size", "16px")
-        .text("Problem Origin by Year"); // Default title
+      // svg
+      //   .append("text")
+      //   .attr("class", "chart-title annotation")
+      //   .attr("x", width / 2)
+      //   .attr("y", -margin.top / 2)
+      //   .attr("text-anchor", "middle")
+      //   .text("Problem Origin by Year"); // Default title
 
       // Add button click handler
       d3.select("#expand-chart").on("click", function () {

@@ -20,11 +20,22 @@ const stepsConfig = [
   },
   {
     id: "quick-fixes",
-    text: "You're a few keystrokes from fixing your marriage. You're one Amazon order from never aging again. You're 8 minutes from knowing all of Wall Street's secrets (or 4 minutes if you watch on 2x).",
+    text: "You’re a few keystrokes from fixing your marriage. You’re one Amazon order from never aging again. You’re 8 minutes from knowing all of Wall Street’s secrets (or 4 minutes if you watch on 2x).",
     fullwidth: false,
     render: () => {
       const figure = d3.select("#figure-container");
       figure.html("");
+
+      // Add the image to the figure (no need for manual fade handling)
+      figure
+        .append("img")
+        .attr("src", "../assets/keystrokes-placeholder.png")
+        .attr("alt", "Quick fixes illustration")
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("object-fit", "contain")
+        .style("display", "block")
+        .style("margin", "0 auto");
     },
   },
   {

@@ -15,7 +15,7 @@
   const height = chapter1Div.clientHeight;
 
   // Set up margins for the chart
-  const margin = { top: 20, right: 20, bottom: 50, left: 60 };
+  const margin = { top: 0, right: 20, bottom: 20, left: 20 };
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
@@ -90,6 +90,9 @@
       // Calculate how many records we can display
       const recordsToDisplay = Math.min(data.length, totalRectangles);
 
+      // Add tooltip div to body
+      const tooltip = d3.select("body").append("div").attr("class", "tooltip");
+
       // Create rectangles for each record
       for (let i = 0; i < recordsToDisplay; i++) {
         const row = Math.floor(i / rectsPerRow);
@@ -103,25 +106,21 @@
           .attr("y", y)
           .attr("width", rectWidth)
           .attr("height", rectHeight)
-          .attr("fill", "#69b3a2")
+          .attr("fill", "var(--color-purple)")
           .attr("stroke", "none")
+          .attr("rx", 1) // Add 1px rounded corner
           .datum(data[i])
           .on("mouseover", function (event, d) {
-            d3.select(this).attr("fill", "#28686e");
-
-            g.append("text")
-              .attr("class", "tooltip")
-              .attr("x", x)
-              .attr("y", y - 5)
-              .style("font-size", "10px")
-              .style("font-weight", "bold")
-              .text(d.name || "Unnamed Record");
+            // Show tooltip with name
+            tooltip
+              .html(d.name || "Unnamed Record")
+              .style("left", event.pageX + 10 + "px")
+              .style("top", event.pageY - 28 + "px")
+              .style("opacity", 0.9);
           })
           .on("mouseout", function () {
-            if (this !== activeRectangle) {
-              d3.select(this).attr("fill", "#69b3a2");
-            }
-            g.selectAll(".tooltip").remove();
+            // Hide tooltip
+            tooltip.style("opacity", 0);
           })
           .on("click", function (event, d) {
             event.stopPropagation(); // Prevent event from bubbling up
@@ -129,9 +128,9 @@
             if (!zoomedIn || this !== activeRectangle) {
               // Store the clicked rectangle as active
               activeRectangle = this;
-              // Highlight the active rectangle
-              g.selectAll("rect").attr("fill", "#69b3a2");
-              d3.select(this).attr("fill", "#28686e");
+              // Only highlight the active rectangle
+              g.selectAll("rect").attr("fill", "var(--color-base-darker)");
+              d3.select(this).attr("fill", "var(--color-purple)");
 
               // Calculate zoom level - we want to show approximately 5-7 books around the clicked one
               const zoomScale = 5;
@@ -165,7 +164,7 @@
               zoomedIn = false;
 
               // Reset all rectangle colors
-              g.selectAll("rect").attr("fill", "#69b3a2");
+              g.selectAll("rect").attr("fill", "var(--color-base-darker)");
             }
           });
       }
@@ -176,6 +175,10 @@
         .attr("y", chartHeight - 10)
         .attr("text-anchor", "middle")
         .style("font-size", "12px")
+        .style("font-family", "Libre Caslon Display, serif")
+        .style("font-weight", "bold")
+        .attr("fill", "white")
+        .attr("filter", "drop-shadow(1px 1px 2px var(--color-base-darker))")
         .text(`Displaying ${recordsToDisplay} of ${data.length} records`);
 
       // Add click handler to background to zoom out
@@ -196,7 +199,7 @@
           zoomedIn = false;
 
           // Reset all rectangle colors
-          g.selectAll("rect").attr("fill", "#69b3a2");
+          g.selectAll("rect").attr("fill", "var(--color-purple)");
         }
       });
     }
@@ -248,13 +251,13 @@
       // Reset/initial view
       svg
         .transition()
-        .duration(750)
+        .duration(0)
         .call(
           zoom.transform,
           d3.zoomIdentity.translate(margin.left, margin.top).scale(1)
         );
       zoomedIn = false;
-      g.selectAll("rect").attr("fill", "#fff");
+      g.selectAll("rect").attr("fill", "var(--color-base-darker)");
     } else if (stepId === "intro-2") {
       // Zoom in to a specific area
       const centerX = chartWidth / 3;
