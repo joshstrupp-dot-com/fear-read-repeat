@@ -1,9 +1,10 @@
 // Chapter 3 - Author Visualization
 (function () {
+  ///////////////////////////////////////////////////////////// ! Setup and Configuration
   // Adjust chapter-3 div to fill the viewport
   const chapter3Div = document.getElementById("chapter-3");
   chapter3Div.style.width = "100vw";
-  chapter3Div.style.height = "90vh";
+  chapter3Div.style.height = "100vh";
   chapter3Div.style.margin = "0";
   chapter3Div.style.padding = "0";
   chapter3Div.style.border = "none";
@@ -15,13 +16,14 @@
   const fullHeight = chapter3Div.clientHeight;
 
   // Set up dimensions and margins for the chart
-  const margin = { top: 20, right: 20, bottom: 50, left: 60 };
+  const margin = { top: 100, right: 100, bottom: 100, left: 100 };
   const width = fullWidth - margin.left - margin.right;
   const height = fullHeight - margin.top - margin.bottom;
 
   let allAuthorData; // Store the data globally
   let svg; // Store the SVG globally
 
+  ///////////////////////////////////////////////////////////// ! Data Filtering Functions
   // Function to filter data based on step ID
   function filterDataForStep(stepId) {
     if (!allAuthorData) return [];
@@ -54,6 +56,7 @@
     }
   }
 
+  ///////////////////////////////////////////////////////////// ! Visualization Functions
   // Function to display author data
   function displayAuthorData(data) {
     if (!data || data.length === 0) return;
@@ -61,6 +64,7 @@
     // Clear existing SVG content first
     svg.selectAll("*").remove();
 
+    ///////////////////////////////////////////////////////////// ! Data Processing
     // Parse numeric data
     data.forEach((d) => {
       d.avg_star_rating = +d.avg_star_rating;
@@ -69,16 +73,17 @@
       d.bt_count = +d.bt_count;
     });
 
+    ///////////////////////////////////////////////////////////// ! Scales Creation
     // Create scales
     const xScale = d3
-      .scaleLog()
-      .domain([1, d3.max(data, (d) => d.author_num_books)]) // Start at 1 since log(0) is undefined
+      .scaleLinear()
+      .domain([2.3, d3.max(data, (d) => d.avg_star_rating)])
       .nice()
       .range([0, width]);
 
     const yScale = d3
-      .scaleLinear()
-      .domain([2.3, d3.max(data, (d) => d.avg_star_rating)])
+      .scaleLog()
+      .domain([1, d3.max(data, (d) => d.author_num_books)])
       .nice()
       .range([height, 0]);
 
@@ -86,104 +91,85 @@
     const colorScale = d3
       .scaleSequential()
       .domain([1, 5])
-      .interpolator(d3.interpolateViridis);
+      .interpolator(
+        d3.interpolateHsl("var(--color-yellow)", "var(--color-pink)")
+      );
 
+    ///////////////////////////////////////////////////////////// ! Axes Creation
     // Add X axis
     svg
       .append("g")
+      .attr("class", "x-axis")
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(xScale))
+      .selectAll("text")
+      .attr("class", "annotation");
+
+    // Add X axis label
+    svg
       .append("text")
+      .attr("class", "annotation")
       .attr("x", width / 2)
-      .attr("y", 40)
-      .attr("fill", "black")
+      .attr("y", height + margin.bottom - 50)
       .style("text-anchor", "middle")
-      .text("Number of Books");
+      .text("Average Star Rating");
 
     // Add Y axis
     svg
       .append("g")
+      .attr("class", "y-axis")
       .call(d3.axisLeft(yScale))
+      .selectAll("text")
+      .attr("class", "annotation");
+
+    // Add Y axis label
+    svg
       .append("text")
+      .attr("class", "annotation")
       .attr("transform", "rotate(-90)")
-      .attr("y", -45)
       .attr("x", -height / 2)
-      .attr("fill", "black")
+      .attr("y", -margin.left + 50)
       .style("text-anchor", "middle")
-      .text("Average Star Rating");
+      .text("Number of Books");
 
+    ///////////////////////////////////////////////////////////// ! Tooltip Creation
     // Add tooltip
-    const tooltip = d3
-      .select("#chapter-3")
-      .append("div")
-      .style("opacity", 0)
-      .attr("class", "tooltip")
-      .style("position", "absolute")
-      .style("background-color", "white")
-      .style("border", "solid")
-      .style("border-width", "1px")
-      .style("border-radius", "5px")
-      .style("padding", "10px");
+    const tooltip = d3.select("body").append("div").attr("class", "tooltip");
 
+    ///////////////////////////////////////////////////////////// ! Data Points Creation
     // Add dots
     svg
       .selectAll("circle")
       .data(data)
       .enter()
       .append("circle")
-      .attr("cx", (d) => xScale(d.author_num_books))
-      .attr("cy", (d) => yScale(d.avg_star_rating))
+      .attr("cx", (d) => xScale(d.avg_star_rating))
+      .attr("cy", (d) => yScale(d.author_num_books))
       .attr("r", 5)
-      .style("fill", (d) =>
-        d.avg_cred_score === 0
-          ? "rgba(0,0,0,0.1)"
-          : colorScale(d.avg_cred_score)
-      )
-      .style("stroke", (d) => (d.bt_count > 0 ? "black" : "none"))
+      .style("fill", "var(--color-base-darker)")
+      .style("opacity", 0.9)
+      .style("stroke", (d) => (d.bt_count > 0 ? "var(--color-teal)" : "none"))
       .style("stroke-width", 1.5)
       .on("mouseover", function (event, d) {
-        tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(
             `<strong>${d.author_clean}</strong><br/>
-                       Books: ${d.author_num_books}<br/>
-                       Rating: ${d.avg_star_rating.toFixed(2)}<br/>
-                       Cred Score: ${d.avg_cred_score.toFixed(2)}`
+             Books: ${d.author_num_books}<br/>
+             Rating: ${d.avg_star_rating.toFixed(2)}<br/>
+             Cred Score: ${d.avg_cred_score.toFixed(2)}`
           )
           .style("left", event.pageX + 10 + "px")
-          .style("top", event.pageY - 28 + "px");
+          .style("top", event.pageY - 28 + "px")
+          .style("opacity", 0.9);
       })
       .on("mouseout", function () {
-        tooltip.transition().duration(500).style("opacity", 0);
+        tooltip.style("opacity", 0);
       });
   }
 
-  // Function to use hardcoded data as fallback
-  function useHardcodedData() {
-    const hardcodedData = [
-      {
-        author_clean: "Jillian Michaels",
-        avg_star_rating: 4.1,
-        author_num_books: 7,
-        avg_cred_score: 3.2,
-        bt_count: 1,
-      },
-      {
-        author_clean: "Donald J. Trump",
-        avg_star_rating: 3.8,
-        author_num_books: 14,
-        avg_cred_score: 2.9,
-        bt_count: 0,
-      },
-      {
-        author_clean: "Daniel Kahneman",
-        avg_star_rating: 4.7,
-        author_num_books: 3,
-        avg_cred_score: 4.9,
-        bt_count: 2,
-      },
-    ];
+  // ///////////////////////////////////////////////////////////// ! Call Filters
 
+  function stepFilter() {
     allAuthorData = hardcodedData;
 
     // Get initial step from URL if available
@@ -193,6 +179,7 @@
     displayAuthorData(filterDataForStep(currentStep));
   }
 
+  ///////////////////////////////////////////////////////////// ! Initialization
   try {
     // Create SVG container
     svg = d3
@@ -215,11 +202,12 @@
 
         displayAuthorData(filterDataForStep(currentStep));
       })
-      .catch(useHardcodedData);
+      .catch(stepFilter);
   } catch (error) {
-    useHardcodedData();
+    stepFilter();
   }
 
+  ///////////////////////////////////////////////////////////// ! Event Listeners
   // Add event listener for visualization updates
   document.addEventListener("visualizationUpdate", (event) => {
     const stepId = event.detail.step;

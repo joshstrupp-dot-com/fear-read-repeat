@@ -41,7 +41,8 @@ function createSteps() {
 // Handle step transitions
 function handleStepEnter(response) {
   // response = { element, direction, index }
-  console.log(response);
+  console.log("Step enter:", response);
+  console.log(`Step ID: ${window.stepsConfig[response.index]?.id}`);
 
   // Add color to current step only
   stepsContainer.selectAll(".step").classed("is-active", (d, i) => {
@@ -60,6 +61,15 @@ function handleStepEnter(response) {
   if (currentStep && currentStep.render) {
     currentStep.render();
   }
+}
+
+// Handle step exit transitions
+function handleStepExit(response) {
+  // response = { element, direction, index }
+  console.log("Step exit:", response);
+  console.log(`Exiting Step ID: ${window.stepsConfig[response.index]?.id}`);
+
+  // Additional exit handling can be added here if needed
 }
 
 // Generic window resize listener event
@@ -96,10 +106,21 @@ function updateScrollama() {
   scroller
     .setup({
       step: "#scrolly article .step",
-      offset: 0.75, // Set to 75% down the viewport
+      offset: 0.6, // Set to 75% down the viewport
       debug: false,
     })
-    .onStepEnter(handleStepEnter);
+    .onStepEnter(handleStepEnter)
+    .onStepExit(handleStepExit)
+    .onStepProgress((response) => {
+      // response = { element, index, progress, direction }
+      // This fires continuously as the user scrolls through a step
+
+      // You can use this to create animations that respond to scroll position
+      // For example, fade elements based on progress
+      if (window.stepsConfig[response.index]?.fade) {
+        d3.select(response.element).style("opacity", response.progress);
+      }
+    });
 
   scroller.resize();
 }

@@ -1,3 +1,47 @@
+:root {
+  --color-base: #f2efe9;
+  --color-base-darker: #e1d6c2;
+  --color-purple: #6822ff;
+  --color-orange: #c37500;
+  --color-teal: #1ec6c0;
+  --color-yellow: #bfbf1d;
+  --color-pink: #be00d7;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: "Andale Mono";
+  font-size: 14px;
+  color: #333;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 250px;
+}
+
+.tooltip strong {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--color-purple);
+}
+
+.annotation {
+  color: #000;
+  font-family: "Andale Mono";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 27px; /* 168.75% */
+  text-transform: uppercase;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -103,8 +147,9 @@ figure p {
   padding: 32px;
   justify-content: flex-start;
   align-items: center;
-  border-radius: 5px;
-  border: 1px solid #000;
+  border-radius: 2px;
+  border: 1px solid #0000006a;
+  width: 24rem; /* Added width to make step slightly wider */
   background: url(../assets/paper.eps) lightgray 0% 0% / 154.22531366348267px
       154.22531366348267px repeat,
     radial-gradient(
@@ -125,11 +170,15 @@ figure p {
   margin-bottom: 0;
 }
 
+.step.fade {
+  opacity: 0;
+}
+
 .step p {
   text-align: left;
   color: #000;
   font-family: "Libre Caslon Display", serif;
-  font-size: 20px;
+  font-size: 18px;
   font-style: normal;
   font-weight: 400;
   line-height: 25px;
