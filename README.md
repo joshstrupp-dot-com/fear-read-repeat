@@ -15,6 +15,7 @@ Self-help is everywhere—books, podcasts, seminars—and whether we realize it 
 Work in Progress: 
 Charting: https://joshstrupp-dot-com.github.io/fear-read-repeat/chart-dev.html
 Scrollytelling: https://joshstrupp-dot-com.github.io/fear-read-repeat/
+Demo: https://raw.githubusercontent.com/%7Buser%7D/%7Brepo%7D/%7Bbranch%7D/%7Bpath-to-file%7D
 
 ## Acknowledgements
 Big thanks to Daniel Sauter for your guidance and boundless enthusiasm. Shout out to Thiago Herson and Richard The for advising and supporting me along the way.
