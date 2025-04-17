@@ -8,6 +8,61 @@
   --color-pink: #be00d7;
 }
 
+/* New text classes */
+.title {
+  font-family: "Libre Caslon Display", serif;
+  font-size: 65px;
+  font-weight: normal;
+  color: #000;
+  position: absolute;
+}
+
+.body {
+  font-family: "Libre Franklin", sans-serif;
+  font-weight: 200;
+  font-size: 20px;
+  color: #000;
+  position: absolute;
+}
+
+/* Positioning classes */
+.top-left {
+  top: 2rem;
+  left: 2rem;
+}
+
+.top-right {
+  top: 2rem;
+  right: 2rem;
+  max-width: 300px;
+  text-align: right;
+}
+
+.center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.bottom-left {
+  bottom: 2rem;
+  left: 2rem;
+}
+
+.bottom-right {
+  bottom: 2rem;
+  right: 2rem;
+}
+
+.body a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.body a:hover {
+  color: var(--color-purple);
+}
+
 .tooltip {
   position: absolute;
   background-color: white;
@@ -62,15 +117,7 @@ body {
   height: 100vh;
   position: relative;
   overflow: hidden;
-}
-
-.hero-image {
-  width: 100%;
-  height: 100%;
-  background-image: url("../preview.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: var(--color-base);
 }
 
 #intro {
