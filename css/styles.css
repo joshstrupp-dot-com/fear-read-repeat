@@ -25,7 +25,14 @@
   position: absolute;
 }
 
-/* Positioning classes */
+/* Hero Section */
+#hero {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
 .top-left {
   top: 2rem;
   left: 2rem;
@@ -109,15 +116,6 @@ body {
   line-height: 1.5;
   color: #333;
   background-color: #f3f1ed;
-}
-
-/* Hero Section */
-#hero {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-  background-color: var(--color-base);
 }
 
 #intro {
