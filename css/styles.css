@@ -229,9 +229,10 @@ figure p {
   line-height: 25px;
 }
 
-.step.statement {
+/* Common styling for statement and header steps */
+.step.statement,
+.step.header {
   border: none;
-
   width: calc(100vw - 9rem);
   text-align: center;
   display: flex;
@@ -241,10 +242,20 @@ figure p {
   padding: 2rem;
 }
 
-.step.statement p {
+/* Common styling for statement and header paragraphs */
+.step.statement p,
+.step.header p {
   line-height: 1.3;
   text-align: center;
   max-width: 80%;
   margin: 0 auto;
-  padding: 0 15rem;
+  padding: 0 6rem;
+}
+
+/* Specific styling for header paragraphs */
+.step.header p {
+  font-size: 65px;
+  font-weight: normal;
+  color: #000;
+  margin-top: 40vh;
 }

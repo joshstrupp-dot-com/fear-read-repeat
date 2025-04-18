@@ -9,6 +9,16 @@
  */
 const stepsConfig = [
   {
+    id: "chapter-1",
+    text: "Chapter 1",
+    fullwidth: true,
+    customClass: "header",
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
+    },
+  },
+  {
     id: "intro",
     text: "Life can really suck. Advice can help. And there is no shortage of advice.",
     fullwidth: true,
@@ -140,6 +150,16 @@ const stepsConfig = [
           detail: { step: "external-internal" },
         })
       );
+    },
+  },
+  {
+    id: "chapter-2",
+    text: "Chapter 2",
+    fullwidth: true,
+    customClass: "header",
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
     },
   },
   {
@@ -276,6 +296,16 @@ const stepsConfig = [
           detail: { step: "all-years" },
         })
       );
+    },
+  },
+  {
+    id: "chapter-3",
+    text: "Chapter 3",
+    fullwidth: true,
+    customClass: "header",
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
     },
   },
   {
@@ -481,6 +511,16 @@ const stepsConfig = [
           detail: { step: "the-secret" },
         })
       );
+    },
+  },
+  {
+    id: "conclusion-header",
+    text: "Conclusion",
+    fullwidth: true,
+    customClass: "header",
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
     },
   },
   {
