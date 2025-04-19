@@ -200,7 +200,7 @@
       // Reference the graph div
       const graphDiv = document.getElementById("chapter-3-3d");
       // If already plotted, animate camera; otherwise do a fresh plot
-      if (graphDiv._fullLayout) {
+      if (graphDiv && graphDiv._fullLayout && graphDiv._fullLayout.scene) {
         // Animate only the camera movement
         Plotly.animate(
           "chapter-3-3d",
