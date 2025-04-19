@@ -30,7 +30,6 @@
     "Cameron Diaz",
     "Brené Brown",
     "Deepak Chopra",
-    "David Goggins",
     "Demi Lovato",
     "Donald J. Trump",
     "Eckhart Tolle",
@@ -39,6 +38,7 @@
     "Gary Vaynerchuk",
     "Gwyneth Paltrow",
     "Jay Shetty",
+    "Jordan B. Peterson",
     "Jen Sincero",
     "Jillian Michaels",
     "Marie Kondo",
@@ -51,6 +51,7 @@
     "Rhonda Byrne",
     "Russell Brand",
     "Phillip C. McGraw",
+    "Stephen King",
     "Tim Ferriss",
     "Tony Robbins",
     "Rich Roll",
@@ -72,10 +73,55 @@
           const isCelebrity = celebrityAuthors.includes(d.author_clean);
           if (isCelebrity) {
             d.highlighted =
+              d.author_clean === "Matthew McConaughey" ||
+              d.author_clean === "Jay Shetty" ||
+              d.author_clean === "Rainn Wilson" ||
+              d.author_clean === "Demi Lovato" ||
               d.author_clean === "Jillian Michaels" ||
-              d.author_clean === "Donald J. Trump";
+              d.author_clean === "50 Cent" ||
+              d.author_clean === "Michelle Obama";
           }
           return isCelebrity;
+        });
+      case "quality-authors":
+        return allAuthorData.filter((d) => {
+          const isCelebrity = celebrityAuthors.includes(d.author_clean);
+          const isHighlighted =
+            d.author_clean === "Esther Hicks" ||
+            d.author_clean === "James Clear" ||
+            d.author_clean === "Brené Brown" ||
+            d.author_clean === "Michelle Obama" ||
+            d.author_clean === "Arnold Schwarzenegger" ||
+            d.author_clean === "Oprah Winfrey" ||
+            d.author_clean === "Matthew McConaughey";
+
+          if (isHighlighted) {
+            d.highlighted = true;
+          } else {
+            d.highlighted = false;
+          }
+          return isCelebrity;
+        });
+
+      case "pusher-authors":
+        return allAuthorData.filter((d) => {
+          const isCelebrity = celebrityAuthors.includes(d.author_clean);
+          const isHighlighted =
+            d.author_clean === "Deepak Chopra" ||
+            d.author_clean === "Jen Sincero" ||
+            d.author_clean === "Donald J. Trump" ||
+            d.author_clean === "Phillip C. McGraw";
+          if (isHighlighted) {
+            d.highlighted = true;
+          } else {
+            d.highlighted = false;
+          }
+          return isCelebrity;
+        });
+      case "credibility-score":
+        return allAuthorData.map((d) => {
+          d.highlighted = d.avg_star_rating < 3.9 && d.author_num_books > 80;
+          return d;
         });
       case "all-authors":
       default:
@@ -179,9 +225,13 @@
       .attr("cx", (d) => xScale(d.avg_star_rating))
       .attr("cy", (d) => yScale(d.author_num_books))
       .attr("r", (d) => (d.highlighted ? 10 : 5))
-      .style("fill", "var(--color-base-darker)")
+      .style("fill", (d) =>
+        d.highlighted ? "var(--color-yellow)" : "var(--color-base-darker)"
+      )
       .style("opacity", 0.9)
-      .style("stroke", (d) => (d.bt_count > 0 ? "var(--color-teal)" : "none"))
+      .style("stroke", (d) =>
+        d.highlighted ? "black" : d.bt_count > 0 ? "var(--color-teal)" : "none"
+      )
       .style("stroke-width", 1.5);
 
     // Add mouseover and mouseout events to circles
@@ -235,8 +285,19 @@
 
     // Check if data is already preloaded in dataCache
     if (window.dataCache && window.dataCache.authorData) {
-      console.log("Using preloaded author data");
-      allAuthorData = window.dataCache.authorData;
+      allAuthorData = window.dataCache.authorData.filter(
+        (author) => author.author_num_books > 0
+      );
+
+      // Update Matthew McConaughey's and Michelle Obama's book counts
+      allAuthorData.forEach((author) => {
+        if (author.author_clean === "Matthew McConaughey") {
+          author.author_num_books = 15;
+        }
+        if (author.author_clean === "Michelle Obama") {
+          author.author_num_books = 60;
+        }
+      });
 
       // Get initial step from URL if available
       const urlParams = new URLSearchParams(window.location.search);
@@ -247,7 +308,18 @@
       // Try loading data directly if not preloaded
       d3.csv("data/sh_0415_author/author.csv")
         .then((data) => {
-          allAuthorData = data; // Store the loaded data
+          // Filter out authors with zero books
+          allAuthorData = data.filter((author) => author.author_num_books > 0);
+
+          // Update Matthew McConaughey's and Michelle Obama's book counts
+          allAuthorData.forEach((author) => {
+            if (author.author_clean === "Matthew McConaughey") {
+              author.author_num_books = 15;
+            }
+            if (author.author_clean === "Michelle Obama") {
+              author.author_num_books = 60;
+            }
+          });
 
           // Get initial step from URL if available
           const urlParams = new URLSearchParams(window.location.search);

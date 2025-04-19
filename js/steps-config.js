@@ -360,7 +360,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "all-authors" },
+          detail: { step: "quality-authors" },
         })
       );
     },
@@ -373,7 +373,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "all-authors" },
+          detail: { step: "pusher-authors" },
         })
       );
     },
@@ -386,7 +386,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "all-authors" },
+          detail: { step: "credibility-score" },
         })
       );
     },
@@ -430,7 +430,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "earned-credibility" },
         })
       );
     },
@@ -443,7 +443,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "earned-credibility" },
         })
       );
     },
@@ -456,7 +456,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "earned-credibility" },
         })
       );
     },
@@ -469,7 +469,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "low-credibility" },
         })
       );
     },
@@ -482,7 +482,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "low-credibility" },
         })
       );
     },
@@ -495,7 +495,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "low-credibility" },
         })
       );
     },
