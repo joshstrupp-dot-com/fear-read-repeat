@@ -23,6 +23,40 @@
   let allAuthorData; // Store the data globally
   let svg; // Store the SVG globally
 
+  // Define celebrity authors list once
+  const celebrityAuthors = [
+    "50 Cent",
+    "Arnold Schwarzenegger",
+    "Cameron Diaz",
+    "Brené Brown",
+    "Deepak Chopra",
+    "David Goggins",
+    "Demi Lovato",
+    "Donald J. Trump",
+    "Eckhart Tolle",
+    "Esther Hicks",
+    "Gabrielle Bernstein",
+    "Gary Vaynerchuk",
+    "Gwyneth Paltrow",
+    "Jay Shetty",
+    "Jen Sincero",
+    "Jillian Michaels",
+    "Marie Kondo",
+    "Mark Manson",
+    "Matthew McConaughey",
+    "Mel Robbins",
+    "Oprah Winfrey",
+    "Michelle Obama",
+    "Rachel Hollis",
+    "Rhonda Byrne",
+    "Russell Brand",
+    "Phillip C. McGraw",
+    "Tim Ferriss",
+    "Tony Robbins",
+    "Rich Roll",
+    "Russell Brand",
+  ];
+
   ///////////////////////////////////////////////////////////// ! Data Filtering Functions
   // Function to filter data based on step ID
   function filterDataForStep(stepId) {
@@ -31,25 +65,18 @@
     switch (stepId) {
       case "celebrity-authors":
         return allAuthorData.filter((d) =>
-          [
-            "Jillian Michaels",
-            "Oprah Winfrey",
-            "Tony Robbins",
-            "Deepak Chopra",
-            "Gwyneth Paltrow",
-            "Marie Kondo",
-            "Tim Ferriss",
-            "Brené Brown",
-            "Rachel Hollis",
-            "Jay Shetty",
-          ].includes(d.author_clean)
+          celebrityAuthors.includes(d.author_clean)
         );
       case "celebrity-authors-2":
-        return allAuthorData.filter(
-          (d) =>
-            d.author_clean === "Jillian Michaels" ||
-            d.author_clean === "Donald J. Trump"
-        );
+        return allAuthorData.filter((d) => {
+          const isCelebrity = celebrityAuthors.includes(d.author_clean);
+          if (isCelebrity) {
+            d.highlighted =
+              d.author_clean === "Jillian Michaels" ||
+              d.author_clean === "Donald J. Trump";
+          }
+          return isCelebrity;
+        });
       case "all-authors":
       default:
         return allAuthorData;
@@ -77,13 +104,19 @@
     // Create scales
     const xScale = d3
       .scaleLinear()
-      .domain([2.3, d3.max(data, (d) => d.avg_star_rating)])
+      .domain([
+        d3.min(data, (d) => d.avg_star_rating),
+        d3.max(data, (d) => d.avg_star_rating),
+      ])
       .nice()
       .range([0, width]);
 
     const yScale = d3
       .scaleLog()
-      .domain([1, d3.max(data, (d) => d.author_num_books)])
+      .domain([
+        1, // Keeping minimum at 1 for log scale
+        d3.max(data, (d) => d.author_num_books),
+      ])
       .nice()
       .range([height, 0]);
 
@@ -138,33 +171,42 @@
 
     ///////////////////////////////////////////////////////////// ! Data Points Creation
     // Add dots
-    svg
+    const circles = svg
       .selectAll("circle")
       .data(data)
       .enter()
       .append("circle")
       .attr("cx", (d) => xScale(d.avg_star_rating))
       .attr("cy", (d) => yScale(d.author_num_books))
-      .attr("r", 5)
+      .attr("r", (d) => (d.highlighted ? 10 : 5))
       .style("fill", "var(--color-base-darker)")
       .style("opacity", 0.9)
       .style("stroke", (d) => (d.bt_count > 0 ? "var(--color-teal)" : "none"))
-      .style("stroke-width", 1.5)
-      .on("mouseover", function (event, d) {
-        tooltip
-          .html(
-            `<strong>${d.author_clean}</strong><br/>
-             Books: ${d.author_num_books}<br/>
-             Rating: ${d.avg_star_rating.toFixed(2)}<br/>
-             Cred Score: ${d.avg_cred_score.toFixed(2)}`
-          )
-          .style("left", event.pageX + 10 + "px")
-          .style("top", event.pageY - 28 + "px")
-          .style("opacity", 0.9);
-      })
-      .on("mouseout", function () {
-        tooltip.style("opacity", 0);
-      });
+      .style("stroke-width", 1.5);
+
+    // Add mouseover and mouseout events to circles
+    circles.on("mouseover", function (event, d) {
+      tooltip
+        .html(
+          `<strong>${d.author_clean}</strong><br/>
+           Books: ${d.author_num_books}<br/>
+           Rating: ${d.avg_star_rating.toFixed(2)}`
+        )
+        .style("left", event.pageX + 10 + "px")
+        .style("top", event.pageY - 28 + "px")
+        .style("opacity", 0.9);
+    });
+
+    circles.on("mouseout", function () {
+      tooltip.style("opacity", 0);
+    });
+
+    // Apply transition separately after setting up the event handlers
+    circles
+      .transition()
+      .duration(800)
+      .ease(d3.easeCubicOut)
+      .attr("r", (d) => (d.highlighted ? 10 : 5));
   }
 
   // ///////////////////////////////////////////////////////////// ! Call Filters
