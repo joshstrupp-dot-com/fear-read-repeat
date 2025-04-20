@@ -30,7 +30,7 @@ const stepsConfig = [
   },
   {
     id: "quick-fixes",
-    text: "You’re a few keystrokes from fixing your marriage. You’re one Amazon order from never aging again. You’re 8 minutes from knowing all of Wall Street’s secrets (or 4 minutes if you watch on 2x).",
+    text: "You're a few keystrokes from fixing your marriage. You're one Amazon order from never aging again. You're 8 minutes from knowing all of Wall Street's secrets (or 4 minutes if you watch on 2x).",
     fullwidth: false,
     render: () => {
       const figure = d3.select("#figure-container");
@@ -50,7 +50,7 @@ const stepsConfig = [
   },
   {
     id: "self-help",
-    text: "This advice is called self-help. Like it or not, realize it or not — you're probably a consumer of self-help.",
+    text: "This advice is called self-help. Like it or not, realize it or not — you're probably a consumer of self-help. <br><br> Today we will be focusing on self help <i>literature</i>.",
     fullwidth: true,
     customClass: "statement",
     render: () => {
@@ -59,8 +59,30 @@ const stepsConfig = [
     },
   },
   {
+    id: "self-help-growth",
+    text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013.",
+    fullwidth: false,
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
+
+      // Add placeholder text for timeline animation
+      figure
+        .append("div")
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("display", "flex")
+        .style("align-items", "center")
+        .style("justify-content", "center")
+        .style("font-size", "1.5rem")
+        .style("color", "#666")
+        .style("font-style", "italic")
+        .text("timeline animation + assets will go here");
+    },
+  },
+  {
     id: "fastest-growing",
-    text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013. There are millions of books out there, but today we'll focus on the 20,000 most read books on Goodreads.",
+    text: "There are millions of books out there, but today we'll focus on the 20,000 most read books on Goodreads.",
     fullwidth: true,
     render: () => {
       // Clear existing content
@@ -86,7 +108,7 @@ const stepsConfig = [
             detail: { step: "intro" },
           })
         );
-      }, 100);
+      }, 500);
     },
   },
   {
@@ -97,7 +119,7 @@ const stepsConfig = [
       // Keep the existing visualization but trigger the zoom update
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "intro-2" },
+          detail: { step: "book-emphasis" },
         })
       );
     },
@@ -108,33 +130,39 @@ const stepsConfig = [
     text: "So much of self-help suggests you're not doing enough, which, in my opinion, isn't cool. Our anxieties are often the result of events outside of our control and some authors efforts to, in the words of scholar Beth Blum in her book The Self-Help Compulsion, \"privatize solutions to systemic problems.\"",
     fullwidth: true,
     render: () => {
-      // Keep the existing visualization in its zoomed state
-      // No need to dispatch a new event as we want to maintain the same view as "blame-game"
+      // Keep the existing visualization in its intro state
+      document.dispatchEvent(
+        new CustomEvent("visualizationUpdate", {
+          detail: { step: "book-emphasis" },
+        })
+      );
     },
   },
 
   {
     id: "two-analyses",
-    text: "What follows are two analyses. The first wil explore how the self help industry took advantage of neoliberal shifts in self care and how (western) world events — not our inability to pray more or take ashwaganda — are at the root of our fears. The second covers which authors may be cashing in.",
+    text: "What follows are two analyses. The first will explore how the self help industry took advantage of neoliberal shifts in self care and how (western) world events — not our inability to pray more or take ashwaganda — are at the root of our fears. The second covers which authors may be cashing in.",
     fullwidth: true,
+    customClass: "statement",
     render: () => {
-      // Empty placeholder for this step
+      // Keep the existing visualization in its intro state
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "two-analyses" },
+          detail: { step: "book-emphasis" },
         })
       );
     },
   },
+
   {
     id: "ml-categories",
-    text: "Using machine learning, every self help book was classified into 10 categories that designate what problem they aim to address.",
+    text: "For the first, we'll use machine learning to classify every book into 10 categories that designate what problem they aim to address.",
     fullwidth: true,
     render: () => {
-      // Empty placeholder for this step
+      // Update to intro-2 step
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "ml-categories" },
+          detail: { step: "intro-2" },
         })
       );
     },

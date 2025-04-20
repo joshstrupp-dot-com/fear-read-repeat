@@ -239,7 +239,14 @@ figure p {
   justify-content: center;
   align-items: center;
   font-family: "Libre Caslon Display", serif;
-  padding: 2rem;
+}
+
+.step.statement {
+  padding: 40vh 2rem;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 /* Common styling for statement and header paragraphs */

@@ -180,68 +180,61 @@
           .attr("stroke", "none")
           .attr("rx", 1) // Add 1px rounded corner
           .datum(data[i])
+          .style("opacity", 0)
           .on("mouseover", function (event, d) {
-            // Show tooltip with name and category
-            tooltip
-              .html(
-                `${d.name || "Unnamed Record"}${
-                  d.key_cat_primary_agg
-                    ? "<br>Category: " + d.key_cat_primary_agg
-                    : ""
-                }`
-              )
-              .style("left", event.pageX + 10 + "px")
-              .style("top", event.pageY - 28 + "px")
-              .style("opacity", 0.9);
+            // Grow the rectangle on hover
+            d3.select(this)
+              .transition()
+              .duration(400)
+              .attr("width", rectWidth * 50)
+              .attr("height", rectHeight * 40)
+              .attr("x", x - rectWidth / 2)
+              .attr("y", y - rectHeight / 2);
+
+            // Get the expanded rect dimensions
+            const expandedWidth = rectWidth * 50;
+            const expandedHeight = rectHeight * 40;
+            const padding = 20; // Padding inside the rectangle
+            const textWidth = expandedWidth - padding * 2; // Text area width
+
+            // Create a foreignObject to allow HTML/CSS text wrapping
+            const textElement = g
+              .append("foreignObject")
+              .attr("class", "temp-book-name")
+              .attr("x", x - rectWidth / 2 + padding)
+              .attr("y", y - rectHeight / 2 + padding)
+              .attr("width", textWidth)
+              .attr("height", expandedHeight - padding * 2)
+              .style("opacity", 0) // Start with opacity 0
+              .html(`<div style="
+                font-family: 'Libre Franklin', sans-serif;
+                font-weight: 200;
+                font-size: 12px;
+                color: #000;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              ">${d.name || "Unnamed Record"}</div>`);
+
+            // Animate text opacity
+            textElement.transition().duration(400).style("opacity", 1); // Fade in to opacity 1
           })
           .on("mouseout", function () {
-            // Hide tooltip
-            tooltip.style("opacity", 0);
-          })
-          .on("click", function (event, d) {
-            event.stopPropagation(); // Prevent event from bubbling up
+            // Reset size on mouseout
+            d3.select(this)
+              .transition()
+              .duration(100)
+              .attr("width", rectWidth)
+              .attr("height", rectHeight)
+              .attr("x", x)
+              .attr("y", y);
 
-            if (!zoomedIn || this !== activeRectangle) {
-              // Store the clicked rectangle as active
-              activeRectangle = this;
-              // Only highlight the active rectangle
-              // g.selectAll("rect").attr("fill", "var(--color-base-darker)");
-              d3.select(this).attr("fill", "var(--color-purple)");
+            // Remove the temporary book name text
+            g.selectAll(".temp-book-name").remove();
 
-              // Calculate zoom level - we want to show approximately 5-7 books around the clicked one
-              const zoomScale = 5;
-
-              // Get the center position of the clicked rectangle
-              const centerX = x + rectWidth / 2;
-              const centerY = y + rectHeight / 2;
-
-              // Calculate the transform to center on the clicked rectangle
-              const transform = d3.zoomIdentity
-                .translate(width / 2, height / 2)
-                .scale(zoomScale)
-                .translate(-centerX, -centerY);
-
-              // Apply the zoom transition
-              svg.transition().duration(750).call(zoom.transform, transform);
-
-              zoomedIn = true;
-            } else if (this === activeRectangle) {
-              // We're clicking on the already zoomed book, so zoom back out
-              activeRectangle = null;
-
-              svg
-                .transition()
-                .duration(750)
-                .call(
-                  zoom.transform,
-                  d3.zoomIdentity.translate(margin.left, margin.top).scale(1)
-                );
-
-              zoomedIn = false;
-
-              // Reset all rectangle colors
-              // g.selectAll("rect").attr("fill", "var(--color-base-darker)");
-            }
+            // // Hide tooltip
+            // tooltip.style("opacity", 0);
           });
       }
 
@@ -361,11 +354,101 @@
         .attr("y", function (d, i) {
           const row = Math.floor(i / rectsPerRow);
           return row * totalRectHeight + spacing;
-        });
+        })
+        .style("opacity", 0)
+        .transition()
+        .duration(1000)
+        .style("opacity", 1);
 
       // Remove any category labels
       g.selectAll(".category-label").remove();
       ///////////////////////////////////////////////////////////// ! organize by category
+    } else if (stepId === "book-emphasis") {
+      // Reset/initial view similar to intro
+      svg
+        .transition()
+        .duration(0)
+        .call(
+          zoom.transform,
+          d3.zoomIdentity.translate(margin.left, margin.top).scale(1)
+        );
+      zoomedIn = false;
+      g.selectAll("rect").attr("fill", "var(--color-base-darker)");
+
+      // Reset positions to grid
+      g.selectAll("rect")
+        .transition()
+        .duration(750)
+        .attr("x", function (d, i) {
+          const col = i % rectsPerRow;
+          return col * totalRectWidth + spacing;
+        })
+        .attr("y", function (d, i) {
+          const row = Math.floor(i / rectsPerRow);
+          return row * totalRectHeight + spacing;
+        });
+      // .style("opacity", 0)
+      // .transition()
+      // .duration(1000)
+      // .style("opacity", 1);
+
+      // Remove any category labels
+      g.selectAll(".category-label").remove();
+
+      // After the grid is set up, highlight specific books
+      setTimeout(() => {
+        const targetBooks = [
+          "Trade Your Way to Financial Freedom",
+          "The Art of Being Kind",
+          "Being Happy!",
+        ];
+
+        g.selectAll("rect")
+          .filter((d) => d && targetBooks.includes(d.name))
+          .each(function (d, i) {
+            const rect = d3.select(this);
+            const x = parseFloat(rect.attr("x"));
+            const y = parseFloat(rect.attr("y"));
+
+            // Grow the rectangle like on hover
+            rect
+              .transition()
+              .duration(400)
+              .attr("width", rectWidth * 50)
+              .attr("height", rectHeight * 40)
+              .attr("x", x - rectWidth / 2)
+              .attr("y", y - rectHeight / 2);
+
+            // Add text label
+            const expandedWidth = rectWidth * 50;
+            const expandedHeight = rectHeight * 40;
+            const padding = 20;
+            const textWidth = expandedWidth - padding * 2;
+
+            g.append("foreignObject")
+              .attr("class", "temp-book-name")
+              .attr("x", x - rectWidth / 2 + padding)
+              .attr("y", y - rectHeight / 2 + padding)
+              .attr("width", textWidth)
+              .attr("height", expandedHeight - padding * 2)
+              .style("opacity", 0)
+              .html(
+                `<div style="
+                font-family: 'Libre Franklin', sans-serif;
+                font-weight: 200;
+                font-size: 12px;
+                color: #000;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              ">${d.name || "Unnamed Record"}</div>`
+              )
+              .transition()
+              .duration(400)
+              .style("opacity", 1);
+          });
+      }, 500); // Reduced wait time from 1500ms to 500ms for quicker highlighting
     } else if (stepId === "intro-2") {
       // Create category piles in a grid layout (5 columns, 2 rows)
       const pilePositions = {};
