@@ -32,6 +32,17 @@
   let categories;
   let showCategories = false; // Default to showing problem origin data
   let showPercentage = false; // Default to showing count data
+  // Tooltip div for hotspots
+  const tooltip = d3
+    .select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("position", "absolute")
+    .style("background", "white")
+    .style("padding", "5px")
+    .style("border", "1px solid #ccc")
+    .style("pointer-events", "none")
+    .style("opacity", 0);
 
   // Function to create safe CSS selector from category name
   function makeSafeSelector(name) {
@@ -92,7 +103,8 @@
       .line()
       .x((d) => x(d.year) + x.bandwidth() / 2)
       .y((d) => y(d.value))
-      .defined((d) => !isNaN(d.value)); // Handle NaN values
+      .defined((d) => !isNaN(d.value))
+      .curve(d3.curveStep); // Add this line to create stepped lines
 
     // Update visibility and lines for each origin
     ["INTERNAL", "EXTERNAL"].forEach((origin) => {
@@ -126,6 +138,43 @@
         .duration(500)
         .attr("d", line)
         .style("opacity", showCategories ? 0 : 1); // Hide when showing categories
+
+      ///////////////////////////////////////////////////////////// ! Hotspot Definition
+
+      const hotspots = svg
+        .selectAll(`.hotspot-${origin}`)
+        .data(visibleLineData, (d) => d.year);
+      hotspots.exit().remove();
+      hotspots
+        .enter()
+        .append("circle")
+        .attr("class", `hotspot hotspot-${origin}`)
+        .attr("r", 5)
+        .attr("fill", color(origin))
+        .style("opacity", 0)
+        .on("mouseover", (event, d) => {
+          const customTooltips = {
+            "1890-1894": "custom text!",
+            // Add more year-bin keys as needed
+          };
+          const content =
+            origin === "INTERNAL" && d.year === "1900-1904"
+              ? '<img src="assets/image-test.png" style="max-width:150px; display:block;" />'
+              : customTooltips[d.year] || d.names.slice(0, 3).join("<br>");
+          tooltip.transition().duration(100).style("opacity", 0.9);
+          tooltip
+            .html(content)
+            .style("left", event.pageX + 10 + "px")
+            .style("top", event.pageY - 10 + "px");
+        })
+        .on("mouseout", () => {
+          tooltip.transition().duration(200).style("opacity", 0);
+        })
+        .merge(hotspots)
+        .transition()
+        .duration(500)
+        .attr("cx", (d) => x(d.year) + x.bandwidth() / 2)
+        .attr("cy", (d) => y(d.value));
     });
 
     // Update category lines
@@ -354,7 +403,8 @@
     const line = d3
       .line()
       .x((d) => x(d.year) + x.bandwidth() / 2)
-      .y((d) => y(d.value));
+      .y((d) => y(d.value))
+      .curve(d3.curveStep); // Add this line to create stepped lines
 
     // Add lines for each problem origin
     ["INTERNAL", "EXTERNAL"].forEach((origin) => {
@@ -402,17 +452,34 @@
     });
 
     ///////////////////////////////////////////////////////////// ! Legend Creation
-    // Add legend
+    // Add legend with background
     const legend = svg
       .append("g")
       .attr("transform", `translate(${width - 150}, 0)`);
 
+    // Add background rectangle for the legend
+    legend
+      .append("rect")
+      .attr("width", 120)
+      .attr("height", 50) // Height to cover both legend items
+      .attr("fill", "var(--color-base)")
+      .attr("rx", 5) // Rounded corners
+      .attr("ry", 5);
+
+    // Add legend title
+    legend
+      .append("text")
+      .attr("x", 10)
+      .attr("y", 15)
+      .attr("class", "annotation")
+      .text("problem stems from:");
+
     // Add origins to legend
-    ["INTERNAL", "EXTERNAL"].forEach((key, i) => {
+    ["YOU", "THE WORLD"].forEach((key, i) => {
       const legendRow = legend
         .append("g")
         .attr("class", "origin-legend")
-        .attr("transform", `translate(0, ${i * 20})`);
+        .attr("transform", `translate(10, ${i * 20 + 25})`); // Adjusted padding to make room for title
 
       legendRow
         .append("rect")
@@ -428,89 +495,89 @@
         .text(key);
     });
 
-    // Add simple buttons for toggling percentage and categories
-    // Create a button group for percentage toggle
-    const percentageButton = legend
-      .append("g")
-      .attr("transform", `translate(0, ${2 * 20 + 10})`);
+    // // Add simple buttons for toggling percentage and categories
+    // // Create a button group for percentage toggle
+    // const percentageButton = legend
+    //   .append("g")
+    //   .attr("transform", `translate(0, ${2 * 20 + 10})`);
 
-    // Add a clickable rectangle for the percentage button
-    percentageButton
-      .append("rect")
-      .attr("width", 100)
-      .attr("height", 20)
-      .attr("fill", "transparent")
-      .style("cursor", "pointer")
-      .on("click", function () {
-        showPercentage = !showPercentage;
-        updateChart();
-      });
+    // // Add a clickable rectangle for the percentage button
+    // percentageButton
+    //   .append("rect")
+    //   .attr("width", 100)
+    //   .attr("height", 20)
+    //   .attr("fill", "transparent")
+    //   .style("cursor", "pointer")
+    //   .on("click", function () {
+    //     showPercentage = !showPercentage;
+    //     updateChart();
+    //   });
 
-    // Add text label for the percentage button
-    percentageButton
-      .append("text")
-      .attr("x", 0)
-      .attr("y", 15)
-      .text("Toggle Percentage")
-      .style("pointer-events", "none"); // Prevent text from blocking clicks
+    // // Add text label for the percentage button
+    // percentageButton
+    //   .append("text")
+    //   .attr("x", 0)
+    //   .attr("y", 15)
+    //   .text("Toggle Percentage")
+    //   .style("pointer-events", "none"); // Prevent text from blocking clicks
 
-    // Create a button group for categories toggle
-    const categoriesButton = legend
-      .append("g")
-      .attr("transform", `translate(0, ${3 * 20 + 10})`);
+    // // Create a button group for categories toggle
+    // const categoriesButton = legend
+    //   .append("g")
+    //   .attr("transform", `translate(0, ${3 * 20 + 10})`);
 
-    // Add a clickable rectangle for the categories button
-    categoriesButton
-      .append("rect")
-      .attr("width", 100)
-      .attr("height", 20)
-      .attr("fill", "transparent")
-      .style("cursor", "pointer")
-      .on("click", function () {
-        showCategories = !showCategories;
-        // Update legend visibility
-        d3.selectAll(".origin-legend").style("opacity", showCategories ? 0 : 1);
-        d3.selectAll(".category-legend").style(
-          "opacity",
-          showCategories ? 1 : 0
-        );
-        updateChart();
-      });
+    // // Add a clickable rectangle for the categories button
+    // categoriesButton
+    //   .append("rect")
+    //   .attr("width", 100)
+    //   .attr("height", 20)
+    //   .attr("fill", "transparent")
+    //   .style("cursor", "pointer")
+    //   .on("click", function () {
+    //     showCategories = !showCategories;
+    //     // Update legend visibility
+    //     d3.selectAll(".origin-legend").style("opacity", showCategories ? 0 : 1);
+    //     d3.selectAll(".category-legend").style(
+    //       "opacity",
+    //       showCategories ? 1 : 0
+    //     );
+    //     updateChart();
+    //   });
 
-    // Add text label for the categories button
-    categoriesButton
-      .append("text")
-      .attr("x", 0)
-      .attr("y", 15)
-      .text("Toggle Categories")
-      .style("pointer-events", "none"); // Prevent text from blocking clicks
+    // // Add text label for the categories button
+    // categoriesButton
+    //   .append("text")
+    //   .attr("x", 0)
+    //   .attr("y", 15)
+    //   .text("Toggle Categories")
+    //   .style("pointer-events", "none"); // Prevent text from blocking clicks
 
-    // Add categories to legend
-    categories.forEach((category, i) => {
-      const legendRow = legend
-        .append("g")
-        .attr("class", "category-legend")
-        .attr("transform", `translate(0, ${i * 20})`)
-        .style("opacity", 0); // Hidden by default
+    // // Add categories to legend
+    // categories.forEach((category, i) => {
+    //   const legendRow = legend
+    //     .append("g")
+    //     .attr("class", "category-legend")
+    //     .attr("transform", `translate(0, ${i * 20})`)
+    //     .style("opacity", 0); // Hidden by default
 
-      legendRow
-        .append("line")
-        .attr("x1", 0)
-        .attr("y1", 7.5)
-        .attr("x2", 15)
-        .attr("y2", 7.5)
-        .attr("stroke", color(category))
-        .attr("stroke-width", 1.5)
-        .attr("stroke-dasharray", "3,3");
+    //   legendRow
+    //     .append("line")
+    //     .attr("x1", 0)
+    //     .attr("y1", 7.5)
+    //     .attr("x2", 15)
+    //     .attr("y2", 7.5)
+    //     .attr("stroke", color(category))
+    //     .attr("stroke-width", 1.5)
+    //     .attr("stroke-dasharray", "3,3");
 
-      legendRow
-        .append("text")
-        .attr("x", 25)
-        .attr("y", 12.5)
-        .attr("class", "annotation")
-        .style("pointer-events", "none") // Prevent text from blocking clicks
-        .text(category);
-    });
+    //   legendRow
+    //     .append("text")
+    //     .attr("x", 25)
+    //     .attr("y", 12.5)
+    //     .attr("class", "annotation")
+    //     .style("pointer-events", "none") // Prevent text from blocking clicks
+    //     .text(category);
+    // });
 
     // Add button click handler for expanding chart
     d3.select("#expand-chart").on("click", function () {
@@ -531,6 +598,10 @@
 
   // Near the end of chapter-2-dev.js
   document.addEventListener("visualizationUpdate", (event) => {
+    // Hide any permanent tooltip when steps change
+    tooltip.transition().duration(200).style("opacity", 0);
+    // Remove any previously shown step image
+    d3.select("#step-image").remove();
     const stepId = event.detail.step;
 
     // Show only 1855-1859
@@ -545,6 +616,15 @@
       // Show years through World War I
       currentVisibleCount = 10;
       updateChart();
+      // Show the test image for this step
+      d3.select("#chapter-2")
+        .append("img")
+        .attr("id", "step-image")
+        .attr("src", "assets/image-test.png")
+        .style("width", "150px")
+        .style("position", "absolute")
+        .style("top", "20px")
+        .style("left", "20px");
     } else if (stepId === "post-20s") {
       // Show years through post-1920s
       currentVisibleCount = 16;

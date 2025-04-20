@@ -262,8 +262,22 @@ const stepsConfig = [
   },
   {
     id: "post-20s",
-    text: "Then prosperity reigned. The post-war pre-roaring 20s saw that familiar “can-do” attitude encourage individuals take their lives and finances by the horns. You can be as great as Gatsby if you read this book! The Great Depression gave rise to entirely new sub-genres of self help as people literally and figuratively hungered for help. It is no coincidence that some of the best-known self-help classics emerged in the 1930s. It was these best-sellers — with their folksy promises that empathic listening and ‘the power of the mind’ can make you rich and successful.",
+    text: "Then prosperity reigned. The post-war pre-roaring 20s saw that familiar “can-do” attitude encourage individuals take their lives and finances by the horns. You can be as great as Gatsby if you read this book! <br><br>The Great Depression gave rise to entirely new sub-genres of self help as people literally and figuratively hungered for help. It is no coincidence that some of the best-known self-help classics emerged in the 1930s. It was these best-sellers — with their folksy promises that empathic listening and ‘the power of the mind’ can make you rich and successful.",
     fullwidth: true,
+    render: () => {
+      // Just update the existing visualization
+      document.dispatchEvent(
+        new CustomEvent("visualizationUpdate", {
+          detail: { step: "post-20s" },
+        })
+      );
+    },
+  },
+  {
+    id: "post-20s",
+    text: "This is the moment where American self help books begin to emphesize the power of the mind; the inward shift from life's unpredictability to the control we have over it.",
+    fullwidth: true,
+    customClass: "emphasis-step",
     render: () => {
       // Just update the existing visualization
       document.dispatchEvent(

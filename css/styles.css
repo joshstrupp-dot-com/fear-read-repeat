@@ -266,3 +266,55 @@ figure p {
   color: #000;
   margin-top: 40vh;
 }
+
+.step.emphasis-step {
+  opacity: 0.9;
+  background-color: var(--color-base);
+  background-image: radial-gradient(
+      circle at 30% 30%,
+      var(--color-teal),
+      transparent 70%
+    ),
+    radial-gradient(circle at 70% 70%, var(--color-orange), transparent 80%),
+    radial-gradient(circle at 20% 60%, var(--color-teal), transparent 60%),
+    radial-gradient(circle at 80% 20%, var(--color-base), transparent 50%);
+  background-size: 200% 200%;
+  position: relative;
+  animation: moveGradient 15s ease infinite;
+}
+
+.step.emphasis-step::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+  opacity: 1;
+  pointer-events: none;
+}
+
+.step.emphasis-step p {
+  color: #000;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes moveGradient {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 50% 25%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 75%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
