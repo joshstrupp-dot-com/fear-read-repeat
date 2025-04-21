@@ -21,7 +21,7 @@
   const height = fullHeight - margin.top - margin.bottom;
 
   // Global variables to track state
-  let currentVisibleCount = 6;
+  let currentVisibleCount = 1;
   let svg;
   let x;
   let y;
@@ -43,6 +43,35 @@
     .style("border", "1px solid #ccc")
     .style("pointer-events", "none")
     .style("opacity", 0);
+
+  // Add a style element for the pulsating animation
+  const styleElement = document.createElement("style");
+  styleElement.textContent = `
+    @keyframes pulsate {
+      0% {
+        r: 5;
+        opacity: 1;
+        stroke-width: 0;
+      }
+      
+      70% {
+        r: 12;
+        opacity: 0.7;
+        stroke-width: 3;
+      }
+      
+      100% {
+        r: 5;
+        opacity: 1;
+        stroke-width: 0;
+      }
+    }
+    
+    .hotspot-pulse {
+      animation: pulsate 2s infinite;
+    }
+  `;
+  document.head.appendChild(styleElement);
 
   // Function to create safe CSS selector from category name
   function makeSafeSelector(name) {
@@ -104,7 +133,7 @@
       .x((d) => x(d.year) + x.bandwidth() / 2)
       .y((d) => y(d.value))
       .defined((d) => !isNaN(d.value))
-      .curve(d3.curveStep); // Add this line to create stepped lines
+      .curve(d3.curveCardinal); // Change to curved line
 
     // Update visibility and lines for each origin
     ["INTERNAL", "EXTERNAL"].forEach((origin) => {
@@ -151,7 +180,7 @@
         .attr("class", `hotspot hotspot-${origin}`)
         .attr("r", 5)
         .attr("fill", color(origin))
-        .style("opacity", 0)
+        .style("opacity", 0.9)
         .on("mouseover", (event, d) => {
           const customTooltips = {
             "1890-1894": "custom text!",
@@ -404,7 +433,7 @@
       .line()
       .x((d) => x(d.year) + x.bandwidth() / 2)
       .y((d) => y(d.value))
-      .curve(d3.curveStep); // Add this line to create stepped lines
+      .curve(d3.curveCardinal); // Change to curved line
 
     // Add lines for each problem origin
     ["INTERNAL", "EXTERNAL"].forEach((origin) => {
@@ -604,14 +633,33 @@
     d3.select("#step-image").remove();
     const stepId = event.detail.step;
 
+    // Reset all pulsating effects before applying to specific hotspots
+    d3.selectAll(".hotspot").classed("hotspot-pulse", false);
+
     // Show only 1855-1859
     if (stepId === "samuel-smiles") {
-      currentVisibleCount = 2;
+      currentVisibleCount = 1;
       updateChart();
+      // After chart update, add pulsating effect to INTERNAL hotspot for 1855-1859
+      setTimeout(() => {
+        d3.selectAll(".hotspot-INTERNAL")
+          .filter((d) => d.year === "1855-1859")
+          .classed("hotspot-pulse", true)
+          .style("stroke", color("INTERNAL"))
+          .style("stroke-opacity", 0.7);
+      }, 600); // Small delay to ensure chart has updated
     } else if (stepId === "turn-of-century") {
       // Show all available years
       currentVisibleCount = 8;
       updateChart();
+      // Add pulsating effect to EXTERNAL hotspots from 1890-1899
+      setTimeout(() => {
+        d3.selectAll(".hotspot-EXTERNAL")
+          .filter((d) => d.year === "1890-1894" || d.year === "1895-1899")
+          .classed("hotspot-pulse", true)
+          .style("stroke", color("EXTERNAL"))
+          .style("stroke-opacity", 0.7);
+      }, 600);
     } else if (stepId === "through-ww1") {
       // Show years through World War I
       currentVisibleCount = 10;
@@ -625,27 +673,84 @@
         .style("position", "absolute")
         .style("top", "20px")
         .style("left", "20px");
+      // Add pulsating effect to INTERNAL hotspot for 1900-1904
+      setTimeout(() => {
+        d3.selectAll(".hotspot-INTERNAL")
+          .filter((d) => d.year === "1900-1904")
+          .classed("hotspot-pulse", true)
+          .style("stroke", color("INTERNAL"))
+          .style("stroke-opacity", 0.7);
+      }, 600);
     } else if (stepId === "post-20s") {
       // Show years through post-1920s
       currentVisibleCount = 16;
       updateChart();
+      // Add pulsating effect to both INTERNAL and EXTERNAL hotspots for 1920-1924
+      setTimeout(() => {
+        d3.selectAll(".hotspot-INTERNAL, .hotspot-EXTERNAL")
+          .filter((d) => d.year === "1920-1924")
+          .classed("hotspot-pulse", true)
+          .style("stroke", function () {
+            return d3.select(this).attr("fill");
+          })
+          .style("stroke-opacity", 0.7);
+      }, 600);
     } else if (stepId === "post-ww2") {
       // Show years through post-1940s
       currentVisibleCount = 23;
       updateChart();
+      // Add pulsating effect to EXTERNAL hotspots for 1945-1949
+      setTimeout(() => {
+        d3.selectAll(".hotspot-EXTERNAL")
+          .filter((d) => d.year === "1945-1949")
+          .classed("hotspot-pulse", true)
+          .style("stroke", color("EXTERNAL"))
+          .style("stroke-opacity", 0.7);
+      }, 600);
     }
     // neoliberal-shift that takes us to visible count through 1994, which is visible count of 26
     else if (stepId === "neoliberal-shift") {
       currentVisibleCount = 26;
       updateChart();
+      // Add pulsating effect to INTERNAL hotspots for 1980-1994
+      setTimeout(() => {
+        d3.selectAll(".hotspot-INTERNAL")
+          .filter((d) =>
+            ["1980-1984", "1985-1989", "1990-1994"].includes(d.year)
+          )
+          .classed("hotspot-pulse", true)
+          .style("stroke", color("INTERNAL"))
+          .style("stroke-opacity", 0.7);
+      }, 600);
     } else if (stepId === "self-as-battlefield") {
       // Show years through 1994
       currentVisibleCount = 26;
       updateChart();
+      // Add pulsating effect to both INTERNAL and EXTERNAL hotspots for 1990-1994
+      setTimeout(() => {
+        d3.selectAll(".hotspot-INTERNAL, .hotspot-EXTERNAL")
+          .filter((d) => d.year === "1990-1994")
+          .classed("hotspot-pulse", true)
+          .style("stroke", function () {
+            return d3.select(this).attr("fill");
+          })
+          .style("stroke-opacity", 0.7);
+      }, 600);
     } else if (stepId === "all-years") {
       // Show all available years
       currentVisibleCount = years.length;
       updateChart();
+      // Add pulsating effect to the most recent year for both origins
+      setTimeout(() => {
+        const lastYear = years[years.length - 1];
+        d3.selectAll(".hotspot-INTERNAL, .hotspot-EXTERNAL")
+          .filter((d) => d.year === lastYear)
+          .classed("hotspot-pulse", true)
+          .style("stroke", function () {
+            return d3.select(this).attr("fill");
+          })
+          .style("stroke-opacity", 0.7);
+      }, 600);
     }
   });
 })();

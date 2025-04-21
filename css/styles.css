@@ -209,6 +209,7 @@ figure p {
   /* Remove vertical positioning that pushed steps down */
   /* position: relative; */
   /* top: 50%; */
+  opacity: 0.9;
 }
 
 .step:last-child {
