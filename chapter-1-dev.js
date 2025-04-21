@@ -448,7 +448,37 @@
               .duration(400)
               .style("opacity", 1);
           });
-      }, 500); // Reduced wait time from 1500ms to 500ms for quicker highlighting
+      }, 500);
+      // Reduced wait time from 1500ms to 500ms for quicker highlighting
+
+      // Add a new step to return to normal view after book emphasis
+    } else if (stepId === "book-emphasis-closed") {
+      // Remove any temporary book name elements
+      g.selectAll(".temp-book-name")
+        .transition()
+        .duration(400)
+        .style("opacity", 0)
+        .remove();
+
+      // Return all highlighted rectangles to their original size
+      const targetBooks = [
+        "Trade Your Way to Financial Freedom",
+        "The Art of Being Kind",
+        "Being Happy!",
+      ];
+
+      g.selectAll("rect")
+        .filter((d) => d && targetBooks.includes(d.name))
+        .transition()
+        .duration(400)
+        .attr("width", rectWidth)
+        .attr("height", rectHeight)
+        .attr("x", function (d) {
+          return d.x;
+        })
+        .attr("y", function (d) {
+          return d.y;
+        });
     } else if (stepId === "intro-2") {
       // Create category piles in a grid layout (5 columns, 2 rows)
       const pilePositions = {};
@@ -555,18 +585,29 @@
         const pos = pilePositions[category];
         if (!pos) return;
 
-        g.append("text")
+        // Calculate width constraint - make it narrower than the column width
+        const labelWidth = colWidth * 0.8; // Use 80% of column width
+
+        // Use foreignObject instead of text element to allow HTML/CSS for text wrapping
+        g.append("foreignObject")
           .attr("class", "category-label")
-          .attr("x", pos.x)
-          .attr("y", pos.y - rowHeight * 0.25)
-          .attr("text-anchor", "middle")
-          .style("font-family", "Libre Franklin, sans-serif")
-          .style("font-weight", "200")
-          .style("font-size", "14px")
-          .style("color", "#000")
-          // .attr("fill", "white")
-          .attr("filter", "drop-shadow(1px 1px 2px var(--color-base-darker))")
-          .text(category);
+          .attr("x", pos.x - labelWidth / 2) // Center the foreignObject
+          .attr("y", pos.y - rowHeight * 0.35) // Position slightly higher to account for wrapped text
+          .attr("width", labelWidth)
+          .attr("height", rowHeight * 0.3) // Provide enough height for two lines of text
+          .html(
+            `<div style="
+            width: 100%;
+            text-align: center;
+            font-family: 'Andale Mono', monospace;
+            font-weight: 200;
+            font-size: 12px;
+            color: #000;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          ">${category}</div>`
+          )
+          .attr("filter", "drop-shadow(1px 1px 2px var(--color-base-darker))");
       });
     } else if (stepId === "external-internal") {
       // Apply color changes immediately based on category

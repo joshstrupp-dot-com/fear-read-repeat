@@ -5,6 +5,7 @@
 
 // Maintain references to key DOM elements and scrollama
 let figure, stepsContainer, scroller, scrolly;
+// Global vizSequence removed in favor of per-step fade flags
 
 // Initialize utils with references to DOM elements
 function initScrollyUtils(
@@ -61,11 +62,28 @@ function handleStepEnter(response) {
   if (currentStep && currentStep.render) {
     currentStep.render();
   }
+  // Per-step fade-in; ensure visibility for steps without fadeIn
+  if (currentStep.fadeIn) {
+    figure
+      .interrupt()
+      .style("opacity", 0)
+      .transition()
+      .duration(500)
+      .style("opacity", 1);
+  } else {
+    // Non-fade steps: reset opacity to fully visible
+    figure.interrupt().style("opacity", 1);
+  }
 }
 
 // Handle step exit transitions
 function handleStepExit(response) {
   // response = { element, direction, index }
+  // Per-step fade-out
+  const exitingStep = window.stepsConfig[response.index];
+  if (exitingStep.fadeOut) {
+    figure.interrupt().transition().duration(500).style("opacity", 0);
+  }
   console.log("Step exit:", response);
   console.log(`Exiting Step ID: ${window.stepsConfig[response.index]?.id}`);
 

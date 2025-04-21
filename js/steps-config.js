@@ -32,6 +32,8 @@ const stepsConfig = [
     id: "quick-fixes",
     text: "You're a few keystrokes from fixing your marriage. You're one Amazon order from never aging again. You're 8 minutes from knowing all of Wall Street's secrets (or 4 minutes if you watch on 2x).",
     fullwidth: false,
+    fadeIn: true,
+    fadeOut: true,
     render: () => {
       const figure = d3.select("#figure-container");
       figure.html("");
@@ -62,6 +64,8 @@ const stepsConfig = [
     id: "self-help-growth",
     text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013.",
     fullwidth: false,
+    fadeIn: true,
+    fadeOut: true,
     render: () => {
       const figure = d3.select("#figure-container");
       figure.html("");
@@ -133,7 +137,7 @@ const stepsConfig = [
       // Keep the existing visualization in its intro state
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "book-emphasis" },
+          detail: { step: "book-emphasis-closed" },
         })
       );
     },
@@ -148,7 +152,7 @@ const stepsConfig = [
       // Keep the existing visualization in its intro state
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "book-emphasis" },
+          detail: { step: "book-emphasis-closed" },
         })
       );
     },
@@ -169,8 +173,9 @@ const stepsConfig = [
   },
   {
     id: "external-internal",
-    text: 'As we explore trends across time, we\'ll explore the progression of self help books through two categories — <span style="color: var(--color-teal);">external</span>, books that explore struggles that originate outside of the self (society, politics, family, metaphysics); and <span style="color: var(--color-orange);">internal</span>,or books that explore anxieties stemming from within the self (self-esteem, willpower, internalized doubt).',
+    text: 'As we explore trends across time, we\'ll explore the progression of self help books through two categories — <span style="color: var(--color-teal);">internal</span>, books that explore anxieties stemming from within <span style="color: var(--color-teal);">you</span> (self-esteem, willpower, internalized doubt); and <span style="color: var(--color-orange);">external</span>, or books that explore struggles that originate outside of the self or from <span style="color: var(--color-orange);">the world</span> (society, politics, family, metaphysics).',
     fullwidth: true,
+    fadeOut: true,
     render: () => {
       // Empty placeholder for this step
       document.dispatchEvent(
@@ -184,6 +189,8 @@ const stepsConfig = [
     id: "chapter-2",
     text: "Chapter 2",
     fullwidth: true,
+    fadeIn: true,
+    fadeOut: true,
     customClass: "header",
     render: () => {
       const figure = d3.select("#figure-container");
@@ -331,6 +338,7 @@ const stepsConfig = [
     id: "all-years",
     text: "Most of you reading this are familiar with what happened next.\nEntering the 21st century, self-help pivoted toward coping and resilience. Between economic crashes, pandemics, and and digital overload, anxiety became the new normal. \nUnfortunately, ideas about how to address and cope with that anxiety still tend to blame you instead of the many forces surrounding us. For example, an overworked employee is told to practice mindfulness and productivity hacks, rather than question labor policies or burnout culture. A chronically anxious individual might be guided to optimize their morning routine instead of also recognizing the role of societal instability or lack of healthcare in their distress.",
     fullwidth: true,
+    fadeOut: true,
     render: () => {
       // Just update the existing visualization
       document.dispatchEvent(
@@ -344,6 +352,8 @@ const stepsConfig = [
     id: "chapter-3",
     text: "Chapter 3",
     fullwidth: true,
+    fadeIn: true,
+    fadeOut: true,
     customClass: "header",
     render: () => {
       const figure = d3.select("#figure-container");
@@ -354,6 +364,7 @@ const stepsConfig = [
     id: "celebrity-authors",
     text: "Turns out the barrier to entry in self help publishing is low. Hence celebrity authors. \nThis is a natural place to begin, because what is a celebrity if not someone who profits from their personal brand. \nNo, that doesn't mean they're praying on your low self esteem. But...",
     fullwidth: true,
+    fadeIn: true,
     render: () => {
       // Clear existing content
       const figure = d3.select("#figure-container");
@@ -424,6 +435,7 @@ const stepsConfig = [
     id: "credibility-score",
     text: "What really makes a pusher, beyond their pump-and-dump books, is their lack of credibility.",
     fullwidth: true,
+
     render: () => {
       // Update the existing visualization
       document.dispatchEvent(
@@ -437,6 +449,8 @@ const stepsConfig = [
     id: "the-secret",
     text: "A notorious example is The Secret, which became a cultural phenomenon by promising that mere thoughts can change reality. The book asserts that if you visualize events \"exactly as you want\" them, you will \"emit a new signal and frequency for tomorrow\" that causes the universe to deliver your desired outcomes. Before publishing The Secret, Rhonda Byrnes produced 'Oz Encounters: UFO's in Australia' and 'The World's Greatest Commercials.' So when this person publishes a best selling books that promises to transform your psychology, I would classify them as a pusher. It's worth noting — people loved The Secret. In my opinion, however, if you're going to speak about something like it's true, have more proof it's true. See: Australian UFOs.",
     fullwidth: true,
+    fadeIn: true,
+    fadeOut: true,
     render: () => {
       // Clear existing content
       const figure = d3.select("#figure-container");
@@ -546,11 +560,12 @@ const stepsConfig = [
     id: "bibliotherapy",
     text: 'In the UK, the "Reading Well: Books on Prescription" program has transformed the way mental health support is delivered by allowing healthcare professionals to literally prescribe self-help books. These books fall into the category of bibliotherapy, or as I like to call it: Self Help Plus Max. With over 3.8 million books borrowed and 92% of readers finding them helpful, the program underscores the therapeutic potential of reading.',
     fullwidth: true,
+    fadeOut: true,
     render: () => {
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "bibliotherapy" },
         })
       );
     },
@@ -559,6 +574,8 @@ const stepsConfig = [
     id: "conclusion-header",
     text: "Conclusion",
     fullwidth: true,
+    fadeIn: true,
+    fadeOut: true,
     customClass: "header",
     render: () => {
       const figure = d3.select("#figure-container");

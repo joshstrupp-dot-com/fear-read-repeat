@@ -39,6 +39,11 @@
             d.author_clean === "P.T. Barnum";
           return d;
         });
+      case "bibliotherapy":
+        return allAuthorData.map((d) => {
+          d.highlighted = d.bt_count >= 1;
+          return d;
+        });
       default:
         return allAuthorData;
     }
@@ -185,6 +190,13 @@
             y: 0,
             z: 1,
           },
+        };
+      } else if (stepId === "bibliotherapy") {
+        // Zoom out to default overview and highlight bibliotherapy authors
+        layout.scene.camera = {
+          center: { x: 0, y: 0, z: 0 },
+          eye: { x: 1.5, y: 1.5, z: 1.5 },
+          up: { x: 0, y: 0, z: 1 },
         };
       }
 
