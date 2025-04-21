@@ -289,7 +289,7 @@ const stepsConfig = [
   },
   {
     id: "post-ww2",
-    text: "Despite selling millions, these prototypical <span style='color: var(--color-teal);'>internal</span> books were no match for those <span style='color: var(--color-orange);'>external</span> books that, once again, reflected the powerlessness that comes from genocide and nuclear doom. <br><br>We look to God. We find meaning in our relationships. We don't focus on ourselves, we focus on our community and our country.",
+    text: "Despite selling millions, the books that indicate your problems come from<span style='color: var(--color-teal);'>you</span> were no match for those that blame <span style='color: var(--color-orange);'>the world</span> books that, once again, reflected the powerlessness that comes from genocide and nuclear doom. <br><br>We look to God. We find meaning in our relationships. We don't focus on ourselves, we focus on our community and our country.",
 
     fullwidth: true,
     render: () => {

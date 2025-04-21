@@ -115,8 +115,11 @@
       .transition()
       .duration(500)
       .call(d3.axisBottom(x))
-      .selectAll("text");
-    // .style("text-anchor", "middle");
+      .selectAll("text")
+      .style("text-anchor", currentVisibleCount > 16 ? "end" : "middle")
+      .attr("transform", currentVisibleCount > 16 ? "rotate(-45)" : "rotate(0)")
+      .attr("dx", currentVisibleCount > 16 ? "-0.8em" : "0")
+      .attr("dy", currentVisibleCount > 16 ? "0.15em" : "0.5em");
 
     // Update y-axis with transition
     svg.select(".y-axis").transition().duration(500).call(d3.axisLeft(y));
@@ -402,7 +405,10 @@
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x))
       .selectAll("text")
-      .style("text-anchor", "middle");
+      .style("text-anchor", currentVisibleCount > 16 ? "end" : "middle")
+      .attr("transform", currentVisibleCount > 16 ? "rotate(-45)" : "rotate(0)")
+      .attr("dx", currentVisibleCount > 16 ? "-0.8em" : "0")
+      .attr("dy", currentVisibleCount > 16 ? "0.15em" : "0.5em");
 
     // Add y-axis
     svg.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
@@ -524,90 +530,6 @@
         .text(key);
     });
 
-    // // Add simple buttons for toggling percentage and categories
-    // // Create a button group for percentage toggle
-    // const percentageButton = legend
-    //   .append("g")
-    //   .attr("transform", `translate(0, ${2 * 20 + 10})`);
-
-    // // Add a clickable rectangle for the percentage button
-    // percentageButton
-    //   .append("rect")
-    //   .attr("width", 100)
-    //   .attr("height", 20)
-    //   .attr("fill", "transparent")
-    //   .style("cursor", "pointer")
-    //   .on("click", function () {
-    //     showPercentage = !showPercentage;
-    //     updateChart();
-    //   });
-
-    // // Add text label for the percentage button
-    // percentageButton
-    //   .append("text")
-    //   .attr("x", 0)
-    //   .attr("y", 15)
-    //   .text("Toggle Percentage")
-    //   .style("pointer-events", "none"); // Prevent text from blocking clicks
-
-    // // Create a button group for categories toggle
-    // const categoriesButton = legend
-    //   .append("g")
-    //   .attr("transform", `translate(0, ${3 * 20 + 10})`);
-
-    // // Add a clickable rectangle for the categories button
-    // categoriesButton
-    //   .append("rect")
-    //   .attr("width", 100)
-    //   .attr("height", 20)
-    //   .attr("fill", "transparent")
-    //   .style("cursor", "pointer")
-    //   .on("click", function () {
-    //     showCategories = !showCategories;
-    //     // Update legend visibility
-    //     d3.selectAll(".origin-legend").style("opacity", showCategories ? 0 : 1);
-    //     d3.selectAll(".category-legend").style(
-    //       "opacity",
-    //       showCategories ? 1 : 0
-    //     );
-    //     updateChart();
-    //   });
-
-    // // Add text label for the categories button
-    // categoriesButton
-    //   .append("text")
-    //   .attr("x", 0)
-    //   .attr("y", 15)
-    //   .text("Toggle Categories")
-    //   .style("pointer-events", "none"); // Prevent text from blocking clicks
-
-    // // Add categories to legend
-    // categories.forEach((category, i) => {
-    //   const legendRow = legend
-    //     .append("g")
-    //     .attr("class", "category-legend")
-    //     .attr("transform", `translate(0, ${i * 20})`)
-    //     .style("opacity", 0); // Hidden by default
-
-    //   legendRow
-    //     .append("line")
-    //     .attr("x1", 0)
-    //     .attr("y1", 7.5)
-    //     .attr("x2", 15)
-    //     .attr("y2", 7.5)
-    //     .attr("stroke", color(category))
-    //     .attr("stroke-width", 1.5)
-    //     .attr("stroke-dasharray", "3,3");
-
-    //   legendRow
-    //     .append("text")
-    //     .attr("x", 25)
-    //     .attr("y", 12.5)
-    //     .attr("class", "annotation")
-    //     .style("pointer-events", "none") // Prevent text from blocking clicks
-    //     .text(category);
-    // });
-
     // Add button click handler for expanding chart
     d3.select("#expand-chart").on("click", function () {
       if (currentVisibleCount < years.length) {
@@ -642,10 +564,10 @@
       updateChart();
       // After chart update, add pulsating effect to INTERNAL hotspot for 1855-1859
       setTimeout(() => {
-        d3.selectAll(".hotspot-INTERNAL")
+        d3.selectAll(".hotspot-EXTERNAL")
           .filter((d) => d.year === "1855-1859")
           .classed("hotspot-pulse", true)
-          .style("stroke", color("INTERNAL"))
+          .style("stroke", color("EXTERNAL"))
           .style("stroke-opacity", 0.7);
       }, 600); // Small delay to ensure chart has updated
     } else if (stepId === "turn-of-century") {
@@ -654,32 +576,56 @@
       updateChart();
       // Add pulsating effect to EXTERNAL hotspots from 1890-1899
       setTimeout(() => {
-        d3.selectAll(".hotspot-EXTERNAL")
+        d3.selectAll(".hotspot-EXTERNAL, .hotspot-INTERNAL")
           .filter((d) => d.year === "1890-1894" || d.year === "1895-1899")
           .classed("hotspot-pulse", true)
-          .style("stroke", color("EXTERNAL"))
+          .style("stroke", function () {
+            return d3.select(this).classed("hotspot-EXTERNAL")
+              ? color("EXTERNAL")
+              : color("INTERNAL");
+          })
           .style("stroke-opacity", 0.7);
       }, 600);
     } else if (stepId === "through-ww1") {
       // Show years through World War I
-      currentVisibleCount = 10;
+      currentVisibleCount = 11;
       updateChart();
-      // Show the test image for this step
-      d3.select("#chapter-2")
-        .append("img")
-        .attr("id", "step-image")
-        .attr("src", "assets/image-test.png")
-        .style("width", "150px")
-        .style("position", "absolute")
-        .style("top", "20px")
-        .style("left", "20px");
-      // Add pulsating effect to INTERNAL hotspot for 1900-1904
+
+      // Add pulsating effect to hotspots
       setTimeout(() => {
-        d3.selectAll(".hotspot-INTERNAL")
-          .filter((d) => d.year === "1900-1904")
+        // Add pulsating effect to both hotspots
+        const pulsatingHotspots = d3
+          .selectAll(".hotspot-EXTERNAL")
+          .filter((d) => d.year === "1905-1909" || d.year === "1910-1914")
           .classed("hotspot-pulse", true)
-          .style("stroke", color("INTERNAL"))
+          .style("stroke", color("EXTERNAL"))
           .style("stroke-opacity", 0.7);
+
+        // Only select the 1905-1909 hotspot for image placement
+        const targetHotspot = d3
+          .selectAll(".hotspot-EXTERNAL")
+          .filter((d) => d.year === "1905-1909")
+          .nodes()[0];
+
+        if (targetHotspot) {
+          // Get position relative to the SVG
+          const bbox = targetHotspot.getBoundingClientRect();
+          const svgRect = svg.node().getBoundingClientRect();
+
+          // Calculate position relative to the page
+          const x = bbox.x - svgRect.x + bbox.width + 10;
+          const y = bbox.y - svgRect.y - 75;
+
+          // Position the image next to the hotspot
+          d3.select("#chapter-2")
+            .append("img")
+            .attr("id", "step-image")
+            .attr("src", "assets/sample-books.png")
+            .style("width", "150px")
+            .style("position", "absolute")
+            .style("top", `${y}px`)
+            .style("left", `${x}px`);
+        }
       }, 600);
     } else if (stepId === "post-20s") {
       // Show years through post-1920s
@@ -688,7 +634,7 @@
       // Add pulsating effect to both INTERNAL and EXTERNAL hotspots for 1920-1924
       setTimeout(() => {
         d3.selectAll(".hotspot-INTERNAL, .hotspot-EXTERNAL")
-          .filter((d) => d.year === "1920-1924")
+          .filter((d) => d.year === "1935-1939")
           .classed("hotspot-pulse", true)
           .style("stroke", function () {
             return d3.select(this).attr("fill");
@@ -702,7 +648,7 @@
       // Add pulsating effect to EXTERNAL hotspots for 1945-1949
       setTimeout(() => {
         d3.selectAll(".hotspot-EXTERNAL")
-          .filter((d) => d.year === "1945-1949")
+          .filter((d) => d.year === "1970-1974")
           .classed("hotspot-pulse", true)
           .style("stroke", color("EXTERNAL"))
           .style("stroke-opacity", 0.7);
@@ -742,7 +688,7 @@
       updateChart();
       // Add pulsating effect to the most recent year for both origins
       setTimeout(() => {
-        const lastYear = years[years.length - 1];
+        const lastYear = years[years.length - 2];
         d3.selectAll(".hotspot-INTERNAL, .hotspot-EXTERNAL")
           .filter((d) => d.year === lastYear)
           .classed("hotspot-pulse", true)
