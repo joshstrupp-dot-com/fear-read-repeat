@@ -9,6 +9,16 @@
  */
 const stepsConfig = [
   {
+    id: "chapter-1",
+    text: "Chapter 1",
+    fullwidth: true,
+    customClass: "header",
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
+    },
+  },
+  {
     id: "intro",
     text: "Life can really suck. Advice can help. And there is no shortage of advice.",
     fullwidth: true,
@@ -20,8 +30,10 @@ const stepsConfig = [
   },
   {
     id: "quick-fixes",
-    text: "You’re a few keystrokes from fixing your marriage. You’re one Amazon order from never aging again. You’re 8 minutes from knowing all of Wall Street’s secrets (or 4 minutes if you watch on 2x).",
+    text: "You're a few keystrokes from fixing your marriage. You're one Amazon order from never aging again. You're 8 minutes from knowing all of Wall Street's secrets (or 4 minutes if you watch on 2x).",
     fullwidth: false,
+    fadeIn: true,
+    fadeOut: true,
     render: () => {
       const figure = d3.select("#figure-container");
       figure.html("");
@@ -40,7 +52,7 @@ const stepsConfig = [
   },
   {
     id: "self-help",
-    text: "This advice is called self-help. Like it or not, realize it or not — you're probably a consumer of self-help.",
+    text: "This advice is called self-help. Like it or not, realize it or not — you're probably a consumer of self-help. <br><br> Today we will be focusing on self help <i>literature</i>.",
     fullwidth: true,
     customClass: "statement",
     render: () => {
@@ -49,8 +61,32 @@ const stepsConfig = [
     },
   },
   {
+    id: "self-help-growth",
+    text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013.",
+    fullwidth: false,
+    fadeIn: true,
+    fadeOut: true,
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
+
+      // Add placeholder text for timeline animation
+      figure
+        .append("div")
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("display", "flex")
+        .style("align-items", "center")
+        .style("justify-content", "center")
+        .style("font-size", "1.5rem")
+        .style("color", "#666")
+        .style("font-style", "italic")
+        .text("timeline animation + assets will go here");
+    },
+  },
+  {
     id: "fastest-growing",
-    text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013. There are millions of books out there, but today we'll focus on the 20,000 most read books on Goodreads.",
+    text: "There are millions of books out there, but today we'll focus on the 20,000 most read books on Goodreads.",
     fullwidth: true,
     render: () => {
       // Clear existing content
@@ -76,7 +112,7 @@ const stepsConfig = [
             detail: { step: "intro" },
           })
         );
-      }, 100);
+      }, 500);
     },
   },
   {
@@ -87,7 +123,7 @@ const stepsConfig = [
       // Keep the existing visualization but trigger the zoom update
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "intro-2" },
+          detail: { step: "book-emphasis" },
         })
       );
     },
@@ -98,41 +134,48 @@ const stepsConfig = [
     text: "So much of self-help suggests you're not doing enough, which, in my opinion, isn't cool. Our anxieties are often the result of events outside of our control and some authors efforts to, in the words of scholar Beth Blum in her book The Self-Help Compulsion, \"privatize solutions to systemic problems.\"",
     fullwidth: true,
     render: () => {
-      // Keep the existing visualization in its zoomed state
-      // No need to dispatch a new event as we want to maintain the same view as "blame-game"
+      // Keep the existing visualization in its intro state
+      document.dispatchEvent(
+        new CustomEvent("visualizationUpdate", {
+          detail: { step: "book-emphasis-closed" },
+        })
+      );
     },
   },
 
   {
     id: "two-analyses",
-    text: "What follows are two analyses. The first wil explore how the self help industry took advantage of neoliberal shifts in self care and how (western) world events — not our inability to pray more or take ashwaganda — are at the root of our fears. The second covers which authors may be cashing in.",
+    text: "What follows are two analyses. The first will explore how the self help industry took advantage of neoliberal shifts in self care and how (western) world events — not our inability to pray more or take ashwaganda — are at the root of our fears. The second covers which authors may be cashing in.",
     fullwidth: true,
+    customClass: "statement",
     render: () => {
-      // Empty placeholder for this step
+      // Keep the existing visualization in its intro state
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "two-analyses" },
+          detail: { step: "book-emphasis-closed" },
         })
       );
     },
   },
+
   {
     id: "ml-categories",
-    text: "Using machine learning, every self help book was classified into 10 categories that designate what problem they aim to address.",
+    text: "For the first, we'll use machine learning to classify every book into 10 categories that designate what problem they aim to address.",
     fullwidth: true,
     render: () => {
-      // Empty placeholder for this step
+      // Update to intro-2 step
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "ml-categories" },
+          detail: { step: "intro-2" },
         })
       );
     },
   },
   {
     id: "external-internal",
-    text: "As we explore trends across time, we'll explore the progression of self help books through two categories — EXTERNAL, books that explore struggles that originate outside of the self (society, politics, family, metaphysics); and INTERNAL,or books that explore anxieties stemming from within the self (self-esteem, willpower, internalized doubt).",
+    text: 'As we explore trends across time, we\'ll explore the progression of self help books through two categories — <span style="color: var(--color-teal);">internal</span>, books that explore anxieties stemming from within <span style="color: var(--color-teal);">you</span> (self-esteem, willpower, internalized doubt); and <span style="color: var(--color-orange);">external</span>, or books that explore struggles that originate outside of the self or from <span style="color: var(--color-orange);">the world</span> (society, politics, family, metaphysics).',
     fullwidth: true,
+    fadeOut: true,
     render: () => {
       // Empty placeholder for this step
       document.dispatchEvent(
@@ -140,6 +183,18 @@ const stepsConfig = [
           detail: { step: "external-internal" },
         })
       );
+    },
+  },
+  {
+    id: "chapter-2",
+    text: "Chapter 2",
+    fullwidth: true,
+    fadeIn: true,
+    fadeOut: true,
+    customClass: "header",
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
     },
   },
   {
@@ -214,7 +269,7 @@ const stepsConfig = [
   },
   {
     id: "post-20s",
-    text: "Then prosperity reigned. The post-war pre-roaring 20s saw that familiar “can-do” attitude encourage individuals take their lives and finances by the horns. You can be as great as Gatsby if you read this book! The Great Depression gave rise to entirely new sub-genres of self help as people literally and figuratively hungered for help. It is no coincidence that some of the best-known self-help classics emerged in the 1930s. It was these best-sellers — with their folksy promises that empathic listening and ‘the power of the mind’ can make you rich and successful.",
+    text: "Then prosperity reigned. The post-war pre-roaring 20s saw that familiar “can-do” attitude encourage individuals take their lives and finances by the horns. You can be as great as Gatsby if you read this book! <br><br>The Great Depression gave rise to entirely new sub-genres of self help as people literally and figuratively hungered for help. It is no coincidence that some of the best-known self-help classics emerged in the 1930s. It was these best-sellers — with their folksy promises that empathic listening and ‘the power of the mind’ can make you rich and successful.",
     fullwidth: true,
     render: () => {
       // Just update the existing visualization
@@ -226,8 +281,23 @@ const stepsConfig = [
     },
   },
   {
+    id: "post-20s",
+    text: "This is the moment where American self help books begin to emphesize the power of the mind; the inward shift from life's unpredictability to the control we have over it.",
+    fullwidth: true,
+    customClass: "emphasis-step",
+    render: () => {
+      // Just update the existing visualization
+      document.dispatchEvent(
+        new CustomEvent("visualizationUpdate", {
+          detail: { step: "post-20s" },
+        })
+      );
+    },
+  },
+  {
     id: "post-ww2",
-    text: "Despite selling millions, these prototypical ‘internal’ books were no match for those ‘external’ books that, once again, reflected the powerlessness that comes from genocide and nuclear doom. We look to God. We find meaning in our relationships. We don’t focus on ourselves, we focus on our community and our country.",
+    text: "Despite selling millions, the books that indicate your problems come from<span style='color: var(--color-teal);'>you</span> were no match for those that blame <span style='color: var(--color-orange);'>the world</span> books that, once again, reflected the powerlessness that comes from genocide and nuclear doom. <br><br>We look to God. We find meaning in our relationships. We don't focus on ourselves, we focus on our community and our country.",
+
     fullwidth: true,
     render: () => {
       // Just update the existing visualization
@@ -268,6 +338,7 @@ const stepsConfig = [
     id: "all-years",
     text: "Most of you reading this are familiar with what happened next.\nEntering the 21st century, self-help pivoted toward coping and resilience. Between economic crashes, pandemics, and and digital overload, anxiety became the new normal. \nUnfortunately, ideas about how to address and cope with that anxiety still tend to blame you instead of the many forces surrounding us. For example, an overworked employee is told to practice mindfulness and productivity hacks, rather than question labor policies or burnout culture. A chronically anxious individual might be guided to optimize their morning routine instead of also recognizing the role of societal instability or lack of healthcare in their distress.",
     fullwidth: true,
+    fadeOut: true,
     render: () => {
       // Just update the existing visualization
       document.dispatchEvent(
@@ -278,9 +349,22 @@ const stepsConfig = [
     },
   },
   {
+    id: "chapter-3",
+    text: "Chapter 3",
+    fullwidth: true,
+    fadeIn: true,
+    fadeOut: true,
+    customClass: "header",
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
+    },
+  },
+  {
     id: "celebrity-authors",
     text: "Turns out the barrier to entry in self help publishing is low. Hence celebrity authors. \nThis is a natural place to begin, because what is a celebrity if not someone who profits from their personal brand. \nNo, that doesn't mean they're praying on your low self esteem. But...",
     fullwidth: true,
+    fadeIn: true,
     render: () => {
       // Clear existing content
       const figure = d3.select("#figure-container");
@@ -329,7 +413,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "all-authors" },
+          detail: { step: "quality-authors" },
         })
       );
     },
@@ -342,7 +426,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "all-authors" },
+          detail: { step: "pusher-authors" },
         })
       );
     },
@@ -351,11 +435,12 @@ const stepsConfig = [
     id: "credibility-score",
     text: "What really makes a pusher, beyond their pump-and-dump books, is their lack of credibility.",
     fullwidth: true,
+
     render: () => {
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "all-authors" },
+          detail: { step: "credibility-score" },
         })
       );
     },
@@ -364,6 +449,8 @@ const stepsConfig = [
     id: "the-secret",
     text: "A notorious example is The Secret, which became a cultural phenomenon by promising that mere thoughts can change reality. The book asserts that if you visualize events \"exactly as you want\" them, you will \"emit a new signal and frequency for tomorrow\" that causes the universe to deliver your desired outcomes. Before publishing The Secret, Rhonda Byrnes produced 'Oz Encounters: UFO's in Australia' and 'The World's Greatest Commercials.' So when this person publishes a best selling books that promises to transform your psychology, I would classify them as a pusher. It's worth noting — people loved The Secret. In my opinion, however, if you're going to speak about something like it's true, have more proof it's true. See: Australian UFOs.",
     fullwidth: true,
+    fadeIn: true,
+    fadeOut: true,
     render: () => {
       // Clear existing content
       const figure = d3.select("#figure-container");
@@ -399,7 +486,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "earned-credibility" },
         })
       );
     },
@@ -412,7 +499,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "earned-credibility" },
         })
       );
     },
@@ -425,7 +512,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "earned-credibility" },
         })
       );
     },
@@ -438,7 +525,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "low-credibility" },
         })
       );
     },
@@ -451,7 +538,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "low-credibility" },
         })
       );
     },
@@ -464,7 +551,7 @@ const stepsConfig = [
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "low-credibility" },
         })
       );
     },
@@ -473,13 +560,26 @@ const stepsConfig = [
     id: "bibliotherapy",
     text: 'In the UK, the "Reading Well: Books on Prescription" program has transformed the way mental health support is delivered by allowing healthcare professionals to literally prescribe self-help books. These books fall into the category of bibliotherapy, or as I like to call it: Self Help Plus Max. With over 3.8 million books borrowed and 92% of readers finding them helpful, the program underscores the therapeutic potential of reading.',
     fullwidth: true,
+    fadeOut: true,
     render: () => {
       // Update the existing visualization
       document.dispatchEvent(
         new CustomEvent("visualizationUpdate", {
-          detail: { step: "the-secret" },
+          detail: { step: "bibliotherapy" },
         })
       );
+    },
+  },
+  {
+    id: "conclusion-header",
+    text: "Conclusion",
+    fullwidth: true,
+    fadeIn: true,
+    fadeOut: true,
+    customClass: "header",
+    render: () => {
+      const figure = d3.select("#figure-container");
+      figure.html("");
     },
   },
   {

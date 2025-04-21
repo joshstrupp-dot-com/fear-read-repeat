@@ -23,6 +23,41 @@
   let allAuthorData; // Store the data globally
   let svg; // Store the SVG globally
 
+  // Define celebrity authors list once
+  const celebrityAuthors = [
+    "50 Cent",
+    "Arnold Schwarzenegger",
+    "Cameron Diaz",
+    "Brené Brown",
+    "Deepak Chopra",
+    "Demi Lovato",
+    "Donald J. Trump",
+    "Eckhart Tolle",
+    "Esther Hicks",
+    "Gabrielle Bernstein",
+    "Gary Vaynerchuk",
+    "Gwyneth Paltrow",
+    "Jay Shetty",
+    "Jordan B. Peterson",
+    "Jen Sincero",
+    "Jillian Michaels",
+    "Marie Kondo",
+    "Mark Manson",
+    "Matthew McConaughey",
+    "Mel Robbins",
+    "Oprah Winfrey",
+    "Michelle Obama",
+    "Rachel Hollis",
+    "Rhonda Byrne",
+    "Russell Brand",
+    "Phillip C. McGraw",
+    "Stephen King",
+    "Tim Ferriss",
+    "Tony Robbins",
+    "Rich Roll",
+    "Russell Brand",
+  ];
+
   ///////////////////////////////////////////////////////////// ! Data Filtering Functions
   // Function to filter data based on step ID
   function filterDataForStep(stepId) {
@@ -31,25 +66,63 @@
     switch (stepId) {
       case "celebrity-authors":
         return allAuthorData.filter((d) =>
-          [
-            "Jillian Michaels",
-            "Oprah Winfrey",
-            "Tony Robbins",
-            "Deepak Chopra",
-            "Gwyneth Paltrow",
-            "Marie Kondo",
-            "Tim Ferriss",
-            "Brené Brown",
-            "Rachel Hollis",
-            "Jay Shetty",
-          ].includes(d.author_clean)
+          celebrityAuthors.includes(d.author_clean)
         );
       case "celebrity-authors-2":
-        return allAuthorData.filter(
-          (d) =>
-            d.author_clean === "Jillian Michaels" ||
-            d.author_clean === "Donald J. Trump"
-        );
+        return allAuthorData.filter((d) => {
+          const isCelebrity = celebrityAuthors.includes(d.author_clean);
+          if (isCelebrity) {
+            d.highlighted =
+              d.author_clean === "Matthew McConaughey" ||
+              d.author_clean === "Jay Shetty" ||
+              d.author_clean === "Rainn Wilson" ||
+              d.author_clean === "Demi Lovato" ||
+              d.author_clean === "Jillian Michaels" ||
+              d.author_clean === "50 Cent" ||
+              d.author_clean === "Michelle Obama";
+          }
+          return isCelebrity;
+        });
+      case "quality-authors":
+        return allAuthorData.filter((d) => {
+          const isCelebrity = celebrityAuthors.includes(d.author_clean);
+          const isHighlighted =
+            d.author_clean === "Esther Hicks" ||
+            d.author_clean === "James Clear" ||
+            d.author_clean === "Brené Brown" ||
+            d.author_clean === "Michelle Obama" ||
+            d.author_clean === "Arnold Schwarzenegger" ||
+            d.author_clean === "Oprah Winfrey" ||
+            d.author_clean === "Matthew McConaughey";
+
+          if (isHighlighted) {
+            d.highlighted = true;
+          } else {
+            d.highlighted = false;
+          }
+          return isCelebrity;
+        });
+
+      case "pusher-authors":
+        return allAuthorData.filter((d) => {
+          const isCelebrity = celebrityAuthors.includes(d.author_clean);
+          const isHighlighted =
+            d.author_clean === "Deepak Chopra" ||
+            d.author_clean === "Jen Sincero" ||
+            d.author_clean === "Donald J. Trump" ||
+            d.author_clean === "Phillip C. McGraw";
+          if (isHighlighted) {
+            d.highlighted = true;
+          } else {
+            d.highlighted = false;
+          }
+          return isCelebrity;
+        });
+      case "credibility-score":
+        return allAuthorData.map((d) => {
+          d.highlighted = d.avg_star_rating < 3.9 && d.author_num_books > 80;
+          return d;
+        });
       case "all-authors":
       default:
         return allAuthorData;
@@ -77,13 +150,19 @@
     // Create scales
     const xScale = d3
       .scaleLinear()
-      .domain([2.3, d3.max(data, (d) => d.avg_star_rating)])
+      .domain([
+        d3.min(data, (d) => d.avg_star_rating),
+        d3.max(data, (d) => d.avg_star_rating),
+      ])
       .nice()
       .range([0, width]);
 
     const yScale = d3
       .scaleLog()
-      .domain([1, d3.max(data, (d) => d.author_num_books)])
+      .domain([
+        1, // Keeping minimum at 1 for log scale
+        d3.max(data, (d) => d.author_num_books),
+      ])
       .nice()
       .range([height, 0]);
 
@@ -138,33 +217,46 @@
 
     ///////////////////////////////////////////////////////////// ! Data Points Creation
     // Add dots
-    svg
+    const circles = svg
       .selectAll("circle")
       .data(data)
       .enter()
       .append("circle")
       .attr("cx", (d) => xScale(d.avg_star_rating))
       .attr("cy", (d) => yScale(d.author_num_books))
-      .attr("r", 5)
-      .style("fill", "var(--color-base-darker)")
+      .attr("r", (d) => (d.highlighted ? 10 : 5))
+      .style("fill", (d) =>
+        d.highlighted ? "var(--color-yellow)" : "var(--color-base-darker)"
+      )
       .style("opacity", 0.9)
-      .style("stroke", (d) => (d.bt_count > 0 ? "var(--color-teal)" : "none"))
-      .style("stroke-width", 1.5)
-      .on("mouseover", function (event, d) {
-        tooltip
-          .html(
-            `<strong>${d.author_clean}</strong><br/>
-             Books: ${d.author_num_books}<br/>
-             Rating: ${d.avg_star_rating.toFixed(2)}<br/>
-             Cred Score: ${d.avg_cred_score.toFixed(2)}`
-          )
-          .style("left", event.pageX + 10 + "px")
-          .style("top", event.pageY - 28 + "px")
-          .style("opacity", 0.9);
-      })
-      .on("mouseout", function () {
-        tooltip.style("opacity", 0);
-      });
+      .style("stroke", (d) =>
+        d.highlighted ? "black" : d.bt_count > 0 ? "var(--color-teal)" : "none"
+      )
+      .style("stroke-width", 1.5);
+
+    // Add mouseover and mouseout events to circles
+    circles.on("mouseover", function (event, d) {
+      tooltip
+        .html(
+          `<strong>${d.author_clean}</strong><br/>
+           Books: ${d.author_num_books}<br/>
+           Rating: ${d.avg_star_rating.toFixed(2)}`
+        )
+        .style("left", event.pageX + 10 + "px")
+        .style("top", event.pageY - 28 + "px")
+        .style("opacity", 0.9);
+    });
+
+    circles.on("mouseout", function () {
+      tooltip.style("opacity", 0);
+    });
+
+    // Apply transition separately after setting up the event handlers
+    circles
+      .transition()
+      .duration(800)
+      .ease(d3.easeCubicOut)
+      .attr("r", (d) => (d.highlighted ? 10 : 5));
   }
 
   // ///////////////////////////////////////////////////////////// ! Call Filters
@@ -191,18 +283,52 @@
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Try loading data
-    d3.csv("data/sh_0415_author/author.csv")
-      .then((data) => {
-        allAuthorData = data; // Store the loaded data
+    // Check if data is already preloaded in dataCache
+    if (window.dataCache && window.dataCache.authorData) {
+      allAuthorData = window.dataCache.authorData.filter(
+        (author) => author.author_num_books > 0
+      );
 
-        // Get initial step from URL if available
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentStep = urlParams.get("step") || "all-authors";
+      // Update Matthew McConaughey's and Michelle Obama's book counts
+      allAuthorData.forEach((author) => {
+        if (author.author_clean === "Matthew McConaughey") {
+          author.author_num_books = 15;
+        }
+        if (author.author_clean === "Michelle Obama") {
+          author.author_num_books = 60;
+        }
+      });
 
-        displayAuthorData(filterDataForStep(currentStep));
-      })
-      .catch(stepFilter);
+      // Get initial step from URL if available
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentStep = urlParams.get("step") || "all-authors";
+
+      displayAuthorData(filterDataForStep(currentStep));
+    } else {
+      // Try loading data directly if not preloaded
+      d3.csv("data/sh_0415_author/author.csv")
+        .then((data) => {
+          // Filter out authors with zero books
+          allAuthorData = data.filter((author) => author.author_num_books > 0);
+
+          // Update Matthew McConaughey's and Michelle Obama's book counts
+          allAuthorData.forEach((author) => {
+            if (author.author_clean === "Matthew McConaughey") {
+              author.author_num_books = 15;
+            }
+            if (author.author_clean === "Michelle Obama") {
+              author.author_num_books = 60;
+            }
+          });
+
+          // Get initial step from URL if available
+          const urlParams = new URLSearchParams(window.location.search);
+          const currentStep = urlParams.get("step") || "all-authors";
+
+          displayAuthorData(filterDataForStep(currentStep));
+        })
+        .catch(stepFilter);
+    }
   } catch (error) {
     stepFilter();
   }
