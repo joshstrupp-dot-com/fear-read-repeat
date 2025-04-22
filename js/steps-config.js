@@ -38,22 +38,172 @@ const stepsConfig = [
       const figure = d3.select("#figure-container");
       figure.html("");
 
-      // Add the image to the figure (no need for manual fade handling)
-      figure
-        .append("img")
-        .attr("src", "../assets/keystrokes-placeholder.png")
-        .attr("alt", "Quick fixes illustration")
-        .style("width", "100%")
+      // Add scrolling words animation container
+      const container = figure
+        .append("div")
         .style("height", "100%")
-        .style("object-fit", "contain")
-        .style("display", "block")
-        .style("margin", "0 auto");
+        .style("display", "flex")
+        .style("align-items", "center")
+        .style("justify-content", "center");
+
+      // Create a search bar container
+      const searchBarContainer = container
+        .append("div")
+        .style("border", "1px solid black")
+        .style("border-radius", "100px")
+        .style("margin-left", "10em")
+        .style("margin-right", "6em")
+        .style("display", "flex")
+        .style("align-items", "center")
+        .style("padding", "8px 12px")
+        .style("box-shadow", "0px 0px 20px rgba(0, 0, 0, 0.1)");
+      // Add the search icon
+      searchBarContainer
+        .append("img")
+        .attr("src", "assets/search-icon.svg")
+        .style("height", "26px")
+        .style("padding-left", "10px")
+        .style("margin-right", "20px");
+
+      // Create the scrolling words container
+      const scrollingContainer = searchBarContainer
+        .append("div")
+        .attr("class", "scrolling-words-container")
+        .style("display", "flex")
+        .style("align-items", "center")
+        .style("font-size", "1.5rem")
+        .style("font-weight", "600")
+        .style("font-family", "Andale Mono, monospace");
+
+      // Create the scrolling words box
+      const scrollingBox = scrollingContainer
+        .append("div")
+        .attr("class", "scrolling-words-box")
+        .style("height", "3rem") // Increased height by 10px (from 3rem to 3.625rem)
+        .style("margin", "auto")
+        .style("overflow", "hidden");
+      // .style("border", "1px solid black")
+      // .style("border-radius", "100px");
+
+      // Create the list of scrolling words
+      const wordsList = scrollingBox
+        .append("ul")
+        .style("margin", "0 0.625rem")
+        .style("padding", "0")
+        .style("animation", "scrollUp 40s infinite"); // Doubled the animation duration to slow it down
+
+      // Add the scrolling words
+      const words = [
+        { text: "why do I feel stuck", color: "#000" },
+        { text: "how to stop overthinking", color: "#000" },
+        { text: "can people really change?", color: "#000" },
+        {
+          text: "how to be more confident",
+          color: "#000",
+        },
+        { text: "fix my relationship", color: "#000" },
+        { text: "IM SO ANXIOUS HALP", color: "#000" },
+        {
+          text: "I hate my job, now what?",
+          color: "#000",
+        },
+        {
+          text: "why am I always tired + unmotivated",
+          color: "#000",
+        },
+        { text: "make friends as an adult", color: "#000" },
+        {
+          text: "how to forgive someone who hurt me",
+          color: "#000",
+        },
+        { text: "best way to build new habits", color: "#000" },
+        { text: "how to stop comparing myself", color: "#000" },
+        { text: "what to do with my life", color: "#000" },
+        {
+          text: "how to believe in myself again",
+          color: "#000",
+        },
+        { text: "is therapy worth it", color: "#000" },
+        {
+          text: "how 2 stop being a people pleaser",
+          color: "#000",
+        },
+        {
+          text: "how to set boundaries without feeling guilty",
+          color: "#000",
+        },
+        { text: "how to start over in life", color: "#000" },
+        {
+          text: "how to heal from childhood trauma",
+          color: "#000",
+        },
+        { text: "how to stop self-sabotaging", color: "#000" },
+      ];
+
+      words.forEach((word) => {
+        wordsList
+          .append("li")
+          .style("display", "flex")
+          .style("align-items", "center")
+          .style("justify-content", "flex-start")
+          .style("height", "3rem")
+          .style("list-style", "none")
+          .style("color", word.color)
+          .text(word.text);
+      });
+
+      // Add the static text
+      // scrollingContainer
+      //   .append("span")
+      //   .style("color", "#5f6368")
+      //   .text("in just minutes");
+
+      // Add the keyframes for the scrolling animation
+      const styleSheet = document.createElement("style");
+      styleSheet.textContent = `
+        @keyframes scrollUp {
+          0%, 8% {
+            transform: translateY(0%);
+          }
+          10%, 18% {
+            transform: translateY(-5%);
+          }
+          20%, 28% {
+            transform: translateY(-10%);
+          }
+          30%, 38% {
+            transform: translateY(-15%);
+          }
+          40%, 48% {
+            transform: translateY(-20%);
+          }
+          50%, 58% {
+            transform: translateY(-25%);
+          }
+          60%, 68% {
+            transform: translateY(-30%);
+          }
+          70%, 78% {
+            transform: translateY(-35%);
+          }
+          80%, 88% {
+            transform: translateY(-40%);
+          }
+          90%, 98% {
+            transform: translateY(-45%);
+          }
+          100% {
+            transform: translateY(0%);
+          }
+        }
+      `;
+      document.head.appendChild(styleSheet);
     },
   },
   {
     id: "self-help",
     text: "This advice is called self-help. Like it or not, realize it or not — you're probably a consumer of self-help. <br><br> Today we will be focusing on self help <i>literature</i>.",
-    fullwidth: true,
+    text: "This advice is called <span style='color: var(--color-purple); font-family: \"Libre Franklin\", sans-serif; font-size: 15px;'>self-help</span>. Like it or not, realize it or not — you're probably a consumer of self-help. <br><br> Today we will be focusing on self help <i>literature</i>.",
     customClass: "statement",
     render: () => {
       const figure = d3.select("#figure-container");
