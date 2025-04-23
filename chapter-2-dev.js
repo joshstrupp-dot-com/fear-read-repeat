@@ -50,20 +50,20 @@
     @keyframes pulsate {
       0% {
         r: 5;
-        opacity: 1;
-        stroke-width: 0;
+        opacity: .8;
+        stroke-width: 1;
       }
       
       70% {
         r: 12;
-        opacity: 0.7;
+        opacity: 1;
         stroke-width: 3;
       }
       
       100% {
         r: 5;
-        opacity: 1;
-        stroke-width: 0;
+        opacity: .8;
+        stroke-width: 1;
       }
     }
     
@@ -162,6 +162,40 @@
           }
         });
 
+      // Create or update gradient for this origin
+      const gradientId = `line-gradient-${origin}`;
+
+      // Remove any existing gradient with this ID
+      svg.select(`#${gradientId}`).remove();
+
+      // Create new gradient
+      const gradient = svg
+        .append("linearGradient")
+        .attr("id", gradientId)
+        .attr("gradientUnits", "userSpaceOnUse")
+        .attr("x1", (d) => x(visibleLineData[0]?.year) + x.bandwidth() / 2) // leftmost point
+        .attr("y1", 0)
+        .attr(
+          "x2",
+          (d) =>
+            x(visibleLineData[visibleLineData.length - 1]?.year) +
+            x.bandwidth() / 2
+        ) // rightmost point
+        .attr("y2", 0);
+
+      // Add gradient stops
+      gradient
+        .append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", color(origin))
+        .attr("stop-opacity", 0.2);
+
+      gradient
+        .append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", color(origin))
+        .attr("stop-opacity", 1);
+
       // Update the actual data line
       svg
         .select(`.line-${origin}`)
@@ -169,7 +203,10 @@
         .transition()
         .duration(500)
         .attr("d", line)
-        .style("opacity", showCategories ? 0 : 1); // Hide when showing categories
+        .style("opacity", showCategories ? 0 : 1) // Hide when showing categories
+        .style("fill", "none") // Ensure no fill
+        .style("stroke", `url(#${gradientId})`) // Apply gradient to stroke
+        .style("stroke-width", 2);
 
       ///////////////////////////////////////////////////////////// ! Hotspot Definition
 
@@ -182,7 +219,9 @@
         .append("circle")
         .attr("class", `hotspot hotspot-${origin}`)
         .attr("r", 5)
-        .attr("fill", color(origin))
+        .attr("fill", "var(--color-base)")
+        .attr("stroke", color(origin))
+        .attr("stroke-width", 1.5)
         .style("opacity", 0.9)
         .on("mouseover", (event, d) => {
           const customTooltips = {
@@ -404,14 +443,29 @@
       .attr("class", "x-axis")
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x))
+      .selectAll("line, path")
+      .style("opacity", 0.25);
+
+    // Style x-axis text labels (keeping full opacity)
+    svg
+      .select(".x-axis")
       .selectAll("text")
+      .style("opacity", 1)
       .style("text-anchor", currentVisibleCount > 16 ? "end" : "middle")
       .attr("transform", currentVisibleCount > 16 ? "rotate(-45)" : "rotate(0)")
       .attr("dx", currentVisibleCount > 16 ? "-0.8em" : "0")
       .attr("dy", currentVisibleCount > 16 ? "0.15em" : "0.5em");
 
     // Add y-axis
-    svg.append("g").attr("class", "y-axis").call(d3.axisLeft(y));
+    svg
+      .append("g")
+      .attr("class", "y-axis")
+      .call(d3.axisLeft(y))
+      .selectAll("line, path")
+      .style("opacity", 0.25);
+
+    // Keep y-axis text labels at full opacity
+    svg.select(".y-axis").selectAll("text").style("opacity", 1);
 
     // Add y-axis label
     svg
@@ -487,34 +541,33 @@
     });
 
     ///////////////////////////////////////////////////////////// ! Legend Creation
-    // Add legend with background
-    const legend = svg
-      .append("g")
-      .attr("transform", `translate(${width - 150}, 0)`);
+    // Add legend with background at top left
+    const legend = svg.append("g").attr("transform", `translate(10, -70)`); // Position at top left
 
     // Add background rectangle for the legend
     legend
       .append("rect")
-      .attr("width", 120)
-      .attr("height", 50) // Height to cover both legend items
+      .attr("width", 300) // Wider to accommodate horizontal layout
+      .attr("height", 30) // Shorter for single row
       .attr("fill", "var(--color-base)")
-      .attr("rx", 5) // Rounded corners
-      .attr("ry", 5);
+      .attr("rx", 10) // Rounded corners
+      .attr("ry", 10);
 
     // Add legend title
     legend
       .append("text")
       .attr("x", 10)
-      .attr("y", 15)
+      .attr("y", 20)
       .attr("class", "annotation")
-      .text("problem stems from:");
+      .attr("font-size", "12px")
+      .text("Problem Origin:");
 
-    // Add origins to legend
+    // Add origins to legend in a horizontal layout
     ["YOU", "THE WORLD"].forEach((key, i) => {
       const legendRow = legend
         .append("g")
         .attr("class", "origin-legend")
-        .attr("transform", `translate(10, ${i * 20 + 25})`); // Adjusted padding to make room for title
+        .attr("transform", `translate(${i * 80 + 175}, 7.5)`); // Horizontal positioning, shifted right 20px
 
       legendRow
         .append("rect")

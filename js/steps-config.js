@@ -405,6 +405,7 @@ const stepsConfig = [
     id: "systemic-problems",
     text: "So much of self-help suggests you're not doing enough, which, in my opinion, isn't cool. Our anxieties are often the result of events outside of our control and some authors efforts to, in the words of scholar Beth Blum in her book The Self-Help Compulsion, \"privatize solutions to systemic problems.\"",
     fullwidth: true,
+    fadeOut: true,
     render: () => {
       // Update the existing grid visualization
       document.dispatchEvent(
@@ -416,7 +417,7 @@ const stepsConfig = [
   },
   {
     id: "fastest-growing",
-    text: "There are millions of books out there, but today we'll focus on the 20,000 most read books on Goodreads.",
+    text: "Today we'll focus on the 20,000 most read books on Goodreads dating back to 1859.",
     fullwidth: true,
     render: () => {
       // Clear existing content

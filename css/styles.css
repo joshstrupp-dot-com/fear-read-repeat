@@ -151,7 +151,7 @@ article {
   position: relative;
   padding: 1rem 1rem 0 1rem;
   max-width: 20rem;
-  z-index: 1;
+  z-index: 1001;
   min-height: 200vh;
 }
 
@@ -245,6 +245,7 @@ figure p {
 .step.statement {
   padding: 40vh 2rem;
   min-height: 100vh;
+  max-width: 100vw;
   box-sizing: border-box;
   display: flex;
   align-items: center;

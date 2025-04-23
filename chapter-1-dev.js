@@ -177,78 +177,68 @@
           .attr("width", rectWidth)
           .attr("height", rectHeight)
           .attr("fill", "var(--color-base-darker)")
-          .attr("stroke", "none")
+          .attr("stroke", "rgba(0, 0, 0, 0.05)")
           .attr("rx", 1) // Add 1px rounded corner
           .datum(data[i])
-          .style("opacity", 0)
-          .on("mouseover", function (event, d) {
-            // Grow the rectangle on hover
-            d3.select(this)
-              .transition()
-              .duration(400)
-              .attr("width", rectWidth * 50)
-              .attr("height", rectHeight * 40)
-              .attr("x", x - rectWidth / 2)
-              .attr("y", y - rectHeight / 2);
+          .style("opacity", 0);
+        // .on("mouseover", function (event, d) {
+        //   // Grow the rectangle on hover
+        //   d3.select(this)
+        //     .transition()
+        //     .duration(400)
+        //     .attr("width", rectWidth * 50)
+        //     .attr("height", rectHeight * 40)
+        //     .attr("x", x - rectWidth / 2)
+        //     .attr("y", y - rectHeight / 2);
 
-            // Get the expanded rect dimensions
-            const expandedWidth = rectWidth * 50;
-            const expandedHeight = rectHeight * 40;
-            const padding = 20; // Padding inside the rectangle
-            const textWidth = expandedWidth - padding * 2; // Text area width
+        //   // Get the expanded rect dimensions
+        //   const expandedWidth = rectWidth * 50;
+        //   const expandedHeight = rectHeight * 40;
+        //   const padding = 20; // Padding inside the rectangle
+        //   const textWidth = expandedWidth - padding * 2; // Text area width
 
-            // Create a foreignObject to allow HTML/CSS text wrapping
-            const textElement = g
-              .append("foreignObject")
-              .attr("class", "temp-book-name")
-              .attr("x", x - rectWidth / 2 + padding)
-              .attr("y", y - rectHeight / 2 + padding)
-              .attr("width", textWidth)
-              .attr("height", expandedHeight - padding * 2)
-              .style("opacity", 0) // Start with opacity 0
-              .html(`<div style="
-                font-family: 'Libre Franklin', sans-serif;
-                font-weight: 200;
-                font-size: 12px;
-                color: #000;
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              ">${d.name || "Unnamed Record"}</div>`);
+        //   // Create a foreignObject to allow HTML/CSS text wrapping
+        //   const textElement = g
+        //     .append("foreignObject")
+        //     .attr("class", "temp-book-name")
+        //     .attr("x", x - rectWidth / 2 + padding)
+        //     .attr("y", y - rectHeight / 2 + padding)
+        //     .attr("width", textWidth)
+        //     .attr("height", expandedHeight - padding * 2)
+        //     .style("opacity", 0) // Start with opacity 0
+        //     .html(`<div style="
+        //       font-family: 'Libre Franklin', sans-serif;
+        //       font-weight: 200;
+        //       font-size: 12px;
+        //       color: #000;
+        //       width: 100%;
+        //       height: 100%;
+        //       overflow: hidden;
+        //       text-overflow: ellipsis;
+        //     ">${d.name || "Unnamed Record"}</div>`);
 
-            // Animate text opacity
-            textElement.transition().duration(400).style("opacity", 1); // Fade in to opacity 1
-          })
-          .on("mouseout", function () {
-            // Reset size on mouseout
-            d3.select(this)
-              .transition()
-              .duration(100)
-              .attr("width", rectWidth)
-              .attr("height", rectHeight)
-              .attr("x", x)
-              .attr("y", y);
+        //   // Animate text opacity
+        //   textElement.transition().duration(400).style("opacity", 1); // Fade in to opacity 1
+        // })
+        // .on("mouseout", function () {
+        //   // Reset size on mouseout
+        //   d3.select(this)
+        //     .transition()
+        //     .duration(100)
+        //     .attr("width", rectWidth)
+        //     .attr("height", rectHeight)
+        //     .attr("x", x)
+        //     .attr("y", y);
 
-            // Remove the temporary book name text
-            g.selectAll(".temp-book-name").remove();
+        //   // Remove the temporary book name text
+        //   g.selectAll(".temp-book-name").remove();
 
-            // // Hide tooltip
-            // tooltip.style("opacity", 0);
-          });
+        //   // // Hide tooltip
+        //   // tooltip.style("opacity", 0);
+        // });
       }
 
       // Add info text about visualization
-      g.append("text")
-        .attr("x", chartWidth / 2)
-        .attr("y", chartHeight - 10)
-        .attr("text-anchor", "middle")
-        .style("font-size", "12px")
-        .style("font-family", "Libre Caslon Display, serif")
-        .style("font-weight", "bold")
-        .attr("fill", "white")
-        .attr("filter", "drop-shadow(1px 1px 2px var(--color-base-darker))")
-        .text(`Displaying ${recordsToDisplay} of ${data.length} records`);
 
       // Add click handler to background to zoom out
       svg.on("click", function (event) {
@@ -343,22 +333,25 @@
       zoomedIn = false;
       g.selectAll("rect").attr("fill", "var(--color-base-darker)");
 
-      // Reset positions to grid
+      // Position all rectangles in their grid positions but with opacity 0
       g.selectAll("rect")
-        .transition()
-        .duration(750)
-        .attr("x", function (d, i) {
-          const col = i % rectsPerRow;
-          return col * totalRectWidth + spacing;
-        })
-        .attr("y", function (d, i) {
-          const row = Math.floor(i / rectsPerRow);
-          return row * totalRectHeight + spacing;
-        })
-        .style("opacity", 0)
-        .transition()
-        .duration(1000)
-        .style("opacity", 1);
+        .attr("x", (d, i) => (i % rectsPerRow) * totalRectWidth + spacing)
+        .attr(
+          "y",
+          (d, i) => Math.floor(i / rectsPerRow) * totalRectHeight + spacing
+        )
+        .style("opacity", 0);
+
+      // Fade in rectangles row by row
+      for (let row = 0; row < rectsPerColumn; row++) {
+        g.selectAll("rect")
+          .filter((d, i) => Math.floor(i / rectsPerRow) === row)
+          .transition()
+          .delay(row * 100) // Delay each row by 100ms
+          .duration(300)
+          .ease(d3.easeLinear)
+          .style("opacity", 1);
+      }
 
       // Remove any category labels
       g.selectAll(".category-label").remove();
@@ -533,8 +526,8 @@
       });
 
       // Apply positions with more heavily staggered movement in batches
-      const batchSize = 100; // Increase batch size from 50 to 100
-      const totalTime = 700; // Reduce total time from 2000 to 700ms
+      const batchSize = 200; // Increase batch size from 50 to 100
+      const totalTime = 1500; // Reduce total time from 2000 to 700ms
 
       // Process nodes in batches
       for (
