@@ -213,25 +213,205 @@ const stepsConfig = [
   {
     id: "self-help-growth",
     text: "Self-help literature, a product born out of and almost entirely consumed in the United States, is the fastest growing nonfiction genre since 2013.",
-    fullwidth: false,
+    fullwidth: true,
     fadeIn: true,
     fadeOut: true,
     render: () => {
       const figure = d3.select("#figure-container");
       figure.html("");
 
-      // Add placeholder text for timeline animation
-      figure
+      // Create SVG for the exponential growth line
+      const width = figure.node().getBoundingClientRect().width;
+      const height = figure.node().getBoundingClientRect().height;
+      const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+
+      const svg = figure
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("overflow", "visible");
+
+      // Create the exponential curve path
+      const generateExponentialPoints = () => {
+        const points = [];
+        const numPoints = 100;
+        for (let i = 0; i < numPoints; i++) {
+          const x = i / (numPoints - 1);
+          // Exponential function: y = e^(ax) - 1 (normalized)
+          const y = Math.exp(3 * x) - 1;
+          points.push([
+            margin.left + x * (width - margin.left - margin.right),
+            height -
+              margin.bottom -
+              (y * (height - margin.top - margin.bottom)) / (Math.exp(3) - 1),
+          ]);
+        }
+        return points;
+      };
+
+      const points = generateExponentialPoints();
+      const lineGenerator = d3.line();
+
+      // Create path element
+      const path = svg
+        .append("path")
+        .attr("d", lineGenerator(points))
+        .attr("fill", "none")
+        .attr("stroke", "#333")
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", function () {
+          return this.getTotalLength();
+        })
+        .attr("stroke-dashoffset", function () {
+          return this.getTotalLength();
+        });
+
+      // Animate the path drawing
+      path
+        .transition()
+        .duration(2000)
+        .ease(d3.easeQuadInOut)
+        .attr("stroke-dashoffset", 0);
+
+      // Get the total length of the path for animation calculations
+      const pathLength = path.node().getTotalLength();
+
+      // Create a second path for the text to follow, offset from the main path
+      const generateOffsetPoints = () => {
+        const offsetPoints = [];
+        const numPoints = 100;
+        for (let i = 0; i < numPoints; i++) {
+          const x = i / (numPoints - 1);
+          // Exponential function: y = e^(ax) - 1 (normalized)
+          const y = Math.exp(3 * x) - 1;
+          offsetPoints.push([
+            margin.left + x * (width - margin.left - margin.right) - 5, // 5 pixels to the left
+            height -
+              margin.bottom -
+              (y * (height - margin.top - margin.bottom)) / (Math.exp(3) - 1) -
+              20, // 20 pixels higher
+          ]);
+        }
+        return offsetPoints;
+      };
+
+      const offsetPoints = generateOffsetPoints();
+
+      // Create marquee text effect along the path (only on one side)
+      // Create a defs element for the path
+      const defs = svg.append("defs");
+
+      // Create a path for the text to follow
+      const textPath = defs
+        .append("path")
+        .attr("id", "textPath-marquee")
+        .attr("d", lineGenerator(offsetPoints));
+
+      // Load self-help book titles from CSV
+      d3.csv("data/sh_0415_time/sh_0415_time.csv")
+        .then((data) => {
+          // Take the first 50 book titles
+          const bookTitles = data.slice(0, 20).map((d) => d.name);
+
+          // Create a text element
+          const text = svg
+            .append("text")
+            .attr("font-family", "Andale Mono, monospace")
+            .attr("font-size", "12px")
+            .attr("fill", "#333");
+
+          // Join all titles with a separator
+          const allTitlesText = bookTitles.join(" • ");
+          const textWidth = allTitlesText.length * 5; // Approximate width in pixels
+
+          // Create textPath for the titles
+          const textPath = text
+            .append("textPath")
+            .attr("href", "#textPath-marquee")
+            .attr("startOffset", "0%")
+            .text(allTitlesText);
+
+          // Animate the text element - moving along the path
+          function animateMarquee() {
+            text
+              .attr("data-offset", 0)
+              .transition()
+              .duration(50000) // Longer duration for the longer text
+              .ease(d3.easeLinear)
+              .attrTween("data-offset", function () {
+                return function (t) {
+                  // Calculate the offset to create a continuous scrolling effect
+                  const offset = (100 * t) % 100;
+                  textPath.attr("startOffset", `${-offset}%`);
+                  return t * 100;
+                };
+              })
+              .on("end", animateMarquee);
+          }
+
+          animateMarquee();
+        })
+        .catch((error) => {
+          console.error("Error loading CSV file:", error);
+
+          // Fallback in case the CSV fails to load
+          const text = svg
+            .append("text")
+            .attr("font-family", "Andale Mono, monospace")
+            .attr("font-size", "12px")
+            .attr("fill", "#333");
+
+          text
+            .append("textPath")
+            .attr("href", "#textPath-marquee")
+            .attr("startOffset", "0%")
+            .text("Self-help literature growth");
+        });
+    },
+  },
+  {
+    id: "blame-game",
+    text: "There are titles that claim your dead-end job is your fault and yours to fix; that you're depressed because you're not doing enough squat jumps; that you can't connect with your child unless you follow these \"ten steps to tame your teen.\"",
+    fullwidth: true,
+    render: () => {
+      // Clear existing content
+      const figure = d3.select("#figure-container");
+      figure.html("");
+
+      // Create a container for the grid visualization
+      const vizContainer = figure
         .append("div")
+        .attr("id", "chapter-1-grid")
         .style("width", "100%")
-        .style("height", "100%")
-        .style("display", "flex")
-        .style("align-items", "center")
-        .style("justify-content", "center")
-        .style("font-size", "1.5rem")
-        .style("color", "#666")
-        .style("font-style", "italic")
-        .text("timeline animation + assets will go here");
+        .style("height", "100%");
+
+      // Load and execute chapter-1-grid.js
+      const script = document.createElement("script");
+      script.src = "chapter-1-grid.js";
+      document.body.appendChild(script);
+
+      // Dispatch an initialization event
+      setTimeout(() => {
+        document.dispatchEvent(
+          new CustomEvent("gridVisualizationUpdate", {
+            detail: { step: "blame-game" },
+          })
+        );
+      }, 500);
+    },
+  },
+
+  {
+    id: "systemic-problems",
+    text: "So much of self-help suggests you're not doing enough, which, in my opinion, isn't cool. Our anxieties are often the result of events outside of our control and some authors efforts to, in the words of scholar Beth Blum in her book The Self-Help Compulsion, \"privatize solutions to systemic problems.\"",
+    fullwidth: true,
+    render: () => {
+      // Update the existing grid visualization
+      document.dispatchEvent(
+        new CustomEvent("gridVisualizationUpdate", {
+          detail: { step: "systemic-problems" },
+        })
+      );
     },
   },
   {
@@ -263,33 +443,6 @@ const stepsConfig = [
           })
         );
       }, 500);
-    },
-  },
-  {
-    id: "blame-game",
-    text: "There are titles that claim your dead-end job is your fault and yours to fix; that you're depressed because you're not doing enough squat jumps; that you can't connect with your child unless you follow these \"ten steps to tame your teen.\"",
-    fullwidth: true,
-    render: () => {
-      // Keep the existing visualization but trigger the zoom update
-      document.dispatchEvent(
-        new CustomEvent("visualizationUpdate", {
-          detail: { step: "book-emphasis" },
-        })
-      );
-    },
-  },
-
-  {
-    id: "systemic-problems",
-    text: "So much of self-help suggests you're not doing enough, which, in my opinion, isn't cool. Our anxieties are often the result of events outside of our control and some authors efforts to, in the words of scholar Beth Blum in her book The Self-Help Compulsion, \"privatize solutions to systemic problems.\"",
-    fullwidth: true,
-    render: () => {
-      // Keep the existing visualization in its intro state
-      document.dispatchEvent(
-        new CustomEvent("visualizationUpdate", {
-          detail: { step: "book-emphasis-closed" },
-        })
-      );
     },
   },
 
